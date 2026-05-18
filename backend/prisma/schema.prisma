@@ -1,0 +1,302 @@
+// 星创想英语跟读 / 背诵作业系统 - 数据库 Schema
+// 数据库：MySQL 8.x
+// ORM：Prisma
+// 命名约定：表 snake_case；字段 snake_case，但在 Prisma Client 中以 camelCase 暴露
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// =============================================
+// 枚举
+// =============================================
+
+/// 管理后台角色
+enum AdminRole {
+  SUPER_ADMIN // 超管
+  TEACHER     // 老师
+}
+
+/// 作业类型：跟读 / 背诵
+enum HomeworkType {
+  REPEAT  // 跟读
+  RECITE  // 背诵
+}
+
+/// 作业分配状态（针对某个学生 / 班级）
+enum AssignmentStatus {
+  PENDING     // 待完成
+  IN_PROGRESS // 进行中
+  SUBMITTED   // 已提交
+  EXPIRED     // 已过期
+}
+
+/// 整体提交状态
+enum SubmissionStatus {
+  DRAFT       // 草稿（还没全部录完）
+  SUBMITTED   // 已提交（待/正在评分）
+  SCORED      // 已评分完成
+}
+
+/// 单题录音评分状态
+enum ItemScoreStatus {
+  PENDING     // 未评分
+  SCORING     // 评分中
+  DONE        // 评分完成
+  FAILED      // 评分失败
+}
+
+// =============================================
+// 用户体系
+// =============================================
+
+/// 管理后台用户（老师 / 超管）
+model AdminUser {
+  id        String    @id @default(cuid())
+  username  String    @unique
+  password  String    // bcrypt 哈希
+  name      String
+  role      AdminRole @default(TEACHER)
+  phone     String?
+  avatar    String?
+  enabled   Boolean   @default(true)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt      @map("updated_at")
+
+  classes       Class[]          @relation("ClassOwner")
+  homeworks     Homework[]       @relation("HomeworkCreator")
+  assignments   Assignment[]     @relation("AssignmentCreator")
+  comments      TeacherComment[] @relation("TeacherCommentAuthor")
+
+  @@map("admin_user")
+}
+
+/// 学生（小程序用户，依赖微信 openId）
+model Student {
+  id          String   @id @default(cuid())
+  openId      String   @unique @map("open_id")
+  unionId     String?  @map("union_id")
+  nickname    String?
+  avatar      String?
+  /// 真实姓名（由老师在管理后台维护或学生绑定时填写）
+  realName    String?  @map("real_name")
+  /// 学号
+  studentNo   String?  @map("student_no")
+  phone       String?
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt      @map("updated_at")
+
+  classMembers ClassMember[]
+  submissions  Submission[]
+
+  @@index([openId])
+  @@map("student")
+}
+
+// =============================================
+// 班级
+// =============================================
+
+model Class {
+  id          String   @id @default(cuid())
+  name        String
+  grade       String?  // 例如：三年级
+  /// 邀请码（学生绑定时使用）
+  inviteCode  String   @unique @map("invite_code")
+  ownerId     String   @map("owner_id")
+  owner       AdminUser @relation("ClassOwner", fields: [ownerId], references: [id])
+  remark      String?
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt      @map("updated_at")
+
+  members     ClassMember[]
+  assignments Assignment[]
+
+  @@map("class")
+}
+
+model ClassMember {
+  id        String   @id @default(cuid())
+  classId   String   @map("class_id")
+  studentId String   @map("student_id")
+  /// 班级内的额外标记，比如学号在该班级里的位置
+  seatNo    String?  @map("seat_no")
+  joinedAt  DateTime @default(now()) @map("joined_at")
+
+  class     Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([classId, studentId])
+  @@map("class_member")
+}
+
+// =============================================
+// 作业 & 题目
+// =============================================
+
+model Homework {
+  id          String       @id @default(cuid())
+  title       String
+  description String?      @db.Text
+  type        HomeworkType @default(REPEAT)
+  /// 总分（评分系统使用，0~100）
+  totalScore  Int          @default(100) @map("total_score")
+  createdById String       @map("created_by_id")
+  createdBy   AdminUser    @relation("HomeworkCreator", fields: [createdById], references: [id])
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt      @map("updated_at")
+
+  items       HomeworkItem[]
+  assignments Assignment[]
+
+  @@map("homework")
+}
+
+/// 一段题目内容（跟读句 / 背诵段落）
+model HomeworkItem {
+  id          String   @id @default(cuid())
+  homeworkId  String   @map("homework_id")
+  /// 排序索引
+  orderNo     Int      @map("order_no")
+  /// 题干文本（英文原文）
+  text        String   @db.Text
+  /// 中文翻译（可选）
+  translation String?  @db.Text
+  /// 参考音频 URL（COS）
+  refAudioUrl String?  @map("ref_audio_url")
+  /// 该题分值（默认按平均分摊）
+  score       Int      @default(0)
+
+  homework    Homework @relation(fields: [homeworkId], references: [id], onDelete: Cascade)
+  submissionItems SubmissionItem[]
+
+  @@unique([homeworkId, orderNo])
+  @@map("homework_item")
+}
+
+// =============================================
+// 作业派发
+// =============================================
+
+/// 派发到班级；学生维度的提交记录在 Submission 里
+model Assignment {
+  id          String   @id @default(cuid())
+  homeworkId  String   @map("homework_id")
+  classId     String   @map("class_id")
+  createdById String   @map("created_by_id")
+  /// 开始时间
+  startAt     DateTime @map("start_at")
+  /// 截止时间
+  endAt       DateTime @map("end_at")
+  remark      String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt      @map("updated_at")
+
+  homework    Homework  @relation(fields: [homeworkId], references: [id], onDelete: Cascade)
+  class       Class     @relation(fields: [classId], references: [id], onDelete: Cascade)
+  createdBy   AdminUser @relation("AssignmentCreator", fields: [createdById], references: [id])
+  submissions Submission[]
+
+  @@unique([homeworkId, classId])
+  @@map("assignment")
+}
+
+// =============================================
+// 提交 & 评分
+// =============================================
+
+model Submission {
+  id             String           @id @default(cuid())
+  assignmentId   String           @map("assignment_id")
+  studentId      String           @map("student_id")
+  status         SubmissionStatus @default(DRAFT)
+  /// 整体得分（所有题目加权平均，0~100）
+  totalScore     Float?           @map("total_score")
+  /// 流利度、完整度、发音三大维度平均分（百分制）
+  fluency        Float?
+  integrity      Float?
+  pronunciation  Float?
+  submittedAt    DateTime?        @map("submitted_at")
+  scoredAt       DateTime?        @map("scored_at")
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt      @map("updated_at")
+
+  assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  student    Student    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  items      SubmissionItem[]
+  comment    TeacherComment?
+
+  @@unique([assignmentId, studentId])
+  @@map("submission")
+}
+
+model SubmissionItem {
+  id             String          @id @default(cuid())
+  submissionId   String          @map("submission_id")
+  homeworkItemId String          @map("homework_item_id")
+  /// 学生录音文件 URL（COS）
+  audioUrl       String?         @map("audio_url")
+  /// 录音时长（秒）
+  duration       Int?
+  status         ItemScoreStatus @default(PENDING)
+  /// 题目得分（百分制）
+  score          Float?
+  fluency        Float?
+  integrity      Float?
+  pronunciation  Float?
+  /// SOE 原始评分 JSON
+  rawScoreJson   Json?           @map("raw_score_json")
+  errorMessage   String?         @map("error_message")
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt      @map("updated_at")
+
+  submission     Submission   @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  homeworkItem   HomeworkItem @relation(fields: [homeworkItemId], references: [id])
+
+  @@unique([submissionId, homeworkItemId])
+  @@map("submission_item")
+}
+
+// =============================================
+// 老师点评（阶段 5）
+// =============================================
+
+/// 老师对某次提交的文字点评；一次提交只保留最新一条（覆盖式）
+model TeacherComment {
+  id           String   @id @default(cuid())
+  submissionId String   @unique @map("submission_id")
+  authorId     String   @map("author_id")
+  content      String   @db.Text
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt      @map("updated_at")
+
+  submission   Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  author       AdminUser  @relation("TeacherCommentAuthor", fields: [authorId], references: [id])
+
+  @@index([authorId])
+  @@map("teacher_comment")
+}
+
+// =============================================
+// 审计日志（可选）
+// =============================================
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  actorType   String   @map("actor_type") // admin / student
+  actorId     String   @map("actor_id")
+  action      String
+  target      String?
+  payloadJson Json?    @map("payload_json")
+  ip          String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([actorType, actorId])
+  @@map("audit_log")
+}

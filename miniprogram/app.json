@@ -1,0 +1,47 @@
+{
+  "pages": [
+    "pages/login/index",
+    "pages/home/index",
+    "pages/task-list/index",
+    "pages/profile/index",
+    "pages/task-detail/index",
+    "pages/task-content/index",
+    "pages/submit-result/index",
+    "pages/history/index"
+  ],
+  "window": {
+    "backgroundColor": "#0E1A4A",
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#0E1A4A",
+    "navigationBarTitleText": "星创想作业",
+    "navigationBarTextStyle": "white"
+  },
+  "tabBar": {
+    "color": "#7E8AB3",
+    "selectedColor": "#3D6BFF",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/home/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/task-list/index",
+        "text": "作业"
+      },
+      {
+        "pagePath": "pages/profile/index",
+        "text": "我的"
+      }
+    ]
+  },
+  "permission": {
+    "scope.record": {
+      "desc": "用于英语跟读 / 背诵作业的录音上传"
+    }
+  },
+  "sitemapLocation": "sitemap.json",
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents"
+}

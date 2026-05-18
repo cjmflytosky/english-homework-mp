@@ -1,0 +1,26 @@
+.star-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 88rpx;
+  border-radius: 44rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  letter-spacing: 2rpx;
+  line-height: 1;
+  padding: 0 48rpx;
+}
+.star-btn--primary {
+  color: #FFFFFF;
+  background: linear-gradient(135deg, #7AA7FF 0%, #3D6BFF 60%, #2C50D9 100%);
+  box-shadow: 0 14rpx 30rpx rgba(61,107,255,0.45);
+}
+.star-btn--ghost {
+  color: #C7D0EA;
+  background: transparent;
+  border: 2rpx solid rgba(255,255,255,0.30);
+}
+.star-btn.is-disabled {
+  opacity: 0.5;
+  box-shadow: none;
+}

@@ -1,0 +1,45 @@
+<view class="login-page">
+  <!-- 顶部星点装饰 -->
+  <view class="stars">
+    <view class="star star--a"></view>
+    <view class="star star--b"></view>
+    <view class="star star--c"></view>
+    <view class="star star--d"></view>
+  </view>
+
+  <view class="brand">
+    <view class="brand__logo">✦</view>
+    <view class="brand__name">星创想 · 英语作业</view>
+    <view class="brand__slogan">跟读 · 背诵 · 进步看得见</view>
+  </view>
+
+  <view class="login-card card">
+    <view class="login-card__title">学生登录</view>
+
+    <view class="profile-row">
+      <button
+        class="avatar-btn"
+        open-type="chooseAvatar"
+        bindchooseavatar="onChooseAvatar">
+        <image wx:if="{{avatar}}" src="{{avatar}}" class="avatar"/>
+        <view wx:else class="avatar avatar--placeholder">头像</view>
+      </button>
+      <input
+        class="nickname-input"
+        type="nickname"
+        placeholder="请填写昵称"
+        value="{{nickname}}"
+        bindinput="onNicknameInput"/>
+    </view>
+
+    <star-button bindtap="onLogin" disabled="{{loading}}">
+      {{loading ? '登录中…' : '微信一键登录'}}
+    </star-button>
+
+    <view class="mock-row" bindtap="onMockLogin">
+      使用体验账号登录
+    </view>
+  </view>
+
+  <view class="tip">登录即代表同意服务条款与隐私协议</view>
+</view>

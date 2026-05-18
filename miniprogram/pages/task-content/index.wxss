@@ -1,0 +1,94 @@
+.top-meta {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 20rpx;
+}
+.top-meta__index { font-size: 26rpx; color: #C7D0EA; }
+.top-meta__type {
+  font-size: 22rpx;
+  padding: 4rpx 14rpx;
+  border-radius: 999rpx;
+  background: rgba(122,167,255,0.18);
+  color: #7AA7FF;
+}
+
+.text-en { font-size: 36rpx; line-height: 1.5; font-weight: 600; }
+.text-cn { font-size: 28rpx; line-height: 1.7; }
+
+.ref-audio { display: flex; align-items: center; gap: 20rpx; padding: 12rpx 4rpx; }
+.ref-audio__btn {
+  width: 80rpx; height: 80rpx; border-radius: 50%;
+  background: linear-gradient(135deg, #7AA7FF, #3D6BFF);
+  color: #fff; font-size: 36rpx;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(61,107,255,0.4);
+}
+.ref-audio__hint { font-size: 26rpx; }
+
+/* 录音区 */
+.recorder { text-align: center; padding: 32rpx 32rpx 36rpx; }
+.recorder__title { font-size: 28rpx; color: #C7D0EA; }
+.recorder__timer { margin-top: 12rpx; font-size: 26rpx; color: #FFFFFF; min-height: 30rpx; }
+.recorder__hint { margin-top: 16rpx; font-size: 22rpx; }
+.recorder__error { margin-top: 12rpx; font-size: 22rpx; color: #F08A8A; }
+
+.rec-btn-wrap { margin: 28rpx 0 8rpx; display: flex; justify-content: center; }
+.rec-btn {
+  width: 160rpx; height: 160rpx; border-radius: 50%;
+  background: linear-gradient(135deg, #FF7AA7, #FF3D6B);
+  color: #FFFFFF;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 56rpx;
+  box-shadow: 0 12rpx 32rpx rgba(255, 61, 107, 0.45);
+  transition: transform 0.15s;
+}
+.rec-btn:active { transform: scale(0.94); }
+.rec-btn--recording { background: linear-gradient(135deg, #FFD27A, #FF8A3D); }
+.rec-btn--uploading,
+.rec-btn--scoring {
+  background: linear-gradient(135deg, #7AA7FF, #3D6BFF);
+  opacity: 0.85;
+}
+.rec-btn__dot {
+  width: 40rpx; height: 40rpx; background: #FFFFFF; border-radius: 8rpx;
+}
+
+/* 评分 */
+.score {
+  margin-top: 28rpx;
+  padding-top: 24rpx;
+  border-top: 2rpx dashed rgba(255,255,255,0.18);
+  display: flex; align-items: center; gap: 24rpx;
+}
+.score__total { display: flex; flex-direction: column; align-items: center; min-width: 140rpx; }
+.score__num {
+  font-size: 72rpx; font-weight: 800;
+  background: linear-gradient(135deg, #7AA7FF, #3D6BFF);
+  -webkit-background-clip: text;
+  color: transparent;
+  line-height: 1;
+}
+.score__label { font-size: 22rpx; margin-top: 6rpx; }
+.score__dims { flex: 1; display: flex; justify-content: space-between; }
+.score__dim { text-align: center; }
+.score__dim-num { font-size: 32rpx; font-weight: 600; color: #FFFFFF; }
+.score__dim-label { font-size: 22rpx; margin-top: 4rpx; }
+
+/* 进度 / 导航 */
+.progress-row { text-align: center; font-size: 24rpx; margin: 24rpx 0 12rpx; }
+
+.nav-row { display: flex; justify-content: space-between; gap: 20rpx; margin-top: 8rpx; }
+.nav-btn {
+  flex: 1; text-align: center;
+  height: 76rpx; line-height: 76rpx;
+  background: rgba(255,255,255,0.08);
+  border: 2rpx solid rgba(255,255,255,0.16);
+  border-radius: 38rpx;
+  color: #C7D0EA;
+  font-size: 26rpx;
+}
+.nav-btn.is-disabled { opacity: 0.35; }
+.nav-btn--primary {
+  background: linear-gradient(135deg, #7AA7FF, #3D6BFF);
+  color: #FFFFFF; border: none;
+  box-shadow: 0 10rpx 24rpx rgba(61,107,255,0.4);
+}

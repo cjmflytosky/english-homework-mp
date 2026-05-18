@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "今日作业",
+  "usingComponents": {
+    "star-card": "/components/star-card/index",
+    "star-button": "/components/star-button/index"
+  }
+}

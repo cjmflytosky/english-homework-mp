@@ -1,0 +1,31 @@
+<view class="page-container" wx:if="{{detail}}">
+  <view class="hero">
+    <view class="hero__title">{{detail.homework.title}}</view>
+    <view class="hero__meta text-soft">
+      <text>{{detail.typeLabel}}</text>
+      <text class="dot">·</text>
+      <text>共 {{detail.homework.items.length}} 题</text>
+      <text class="dot">·</text>
+      <text>截止 {{detail.endAtLabel}}</text>
+    </view>
+  </view>
+
+  <star-card wx:if="{{detail.homework.description}}" title="作业说明">
+    <view class="text-soft desc">{{detail.homework.description}}</view>
+  </star-card>
+
+  <view class="section-title">任务列表</view>
+  <block wx:for="{{detail.homework.items}}" wx:key="id">
+    <view class="item" data-idx="{{index}}" bindtap="goItem">
+      <view class="item__no">{{item.orderNo}}</view>
+      <view class="item__body">
+        <view class="item__text">{{item.text}}</view>
+        <view wx:if="{{item.translation}}" class="item__tr text-muted">{{item.translation}}</view>
+      </view>
+      <view class="item__arrow">›</view>
+    </view>
+  </block>
+</view>
+
+<view wx:elif="{{loading}}" class="page-container text-soft">加载中…</view>
+<view wx:else class="page-container text-soft">未找到作业</view>

@@ -1,0 +1,42 @@
+<view class="page-container">
+  <view class="hero">
+    <view class="hero__greeting">
+      <view class="hero__hi">Hi，{{student.nickname || '同学'}}</view>
+      <view class="hero__date">{{todayDate}} · 一起来完成今日作业 ✦</view>
+    </view>
+    <view class="hero__avatar">
+      <image wx:if="{{student.avatar}}" src="{{student.avatar}}"/>
+      <text wx:else>★</text>
+    </view>
+  </view>
+
+  <star-card title="今日进度" extra="阶段 1">
+    <view class="progress">
+      <view class="progress__bar"><view class="progress__fill" style="width: 0%"></view></view>
+      <view class="progress__meta text-soft">阶段 1 仅展示骨架，作业能力将在阶段 2 上线</view>
+    </view>
+  </star-card>
+
+  <star-card title="快捷入口">
+    <view class="quick-row">
+      <view class="quick-item" bindtap="goTasks">
+        <view class="quick-item__icon">📚</view>
+        <view class="quick-item__label">作业列表</view>
+      </view>
+      <view class="quick-item">
+        <view class="quick-item__icon">🎙</view>
+        <view class="quick-item__label">最近录音</view>
+      </view>
+      <view class="quick-item">
+        <view class="quick-item__icon">🏆</view>
+        <view class="quick-item__label">班级排名</view>
+      </view>
+    </view>
+  </star-card>
+
+  <star-card title="本周提示">
+    <view class="tip-text">
+      记得每天进行 15 分钟英文跟读，发音、流利度都会越来越棒！
+    </view>
+  </star-card>
+</view>

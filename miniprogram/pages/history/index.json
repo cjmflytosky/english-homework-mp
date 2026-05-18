@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "我的历史",
+  "usingComponents": {
+    "star-card": "/components/star-card/index"
+  }
+}

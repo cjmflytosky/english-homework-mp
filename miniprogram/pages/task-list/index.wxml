@@ -1,0 +1,25 @@
+<view class="page-container">
+  <view class="header">
+    <view class="title">作业列表</view>
+    <view class="subtitle">展示派发到你的全部作业</view>
+  </view>
+
+  <block wx:for="{{list}}" wx:key="id">
+    <view class="task-card" data-id="{{item.id}}" bindtap="goDetail">
+      <view class="task-card__row">
+        <view class="task-card__title">{{item.homework.title}}</view>
+        <view class="badge badge--{{item.status}}">{{item.statusLabel}}</view>
+      </view>
+      <view class="task-card__meta text-soft">
+        <text>{{item.typeLabel}}</text>
+        <text class="dot">·</text>
+        <text>{{item.homework.itemCount}} 题</text>
+        <text class="dot">·</text>
+        <text>截止 {{item.endAtLabel}}</text>
+      </view>
+      <view class="task-card__arrow">›</view>
+    </view>
+  </block>
+
+  <view wx:if="{{!loading && list.length === 0}}" class="empty text-soft">暂无作业</view>
+</view>

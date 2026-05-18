@@ -1,0 +1,82 @@
+<view class="page-container" wx:if="{{item}}">
+  <view class="top-meta">
+    <view class="top-meta__index">第 {{currentIndex + 1}} / {{totalCount}} 题</view>
+    <view class="top-meta__type">{{typeLabel}}</view>
+  </view>
+
+  <star-card title="英文原句">
+    <view class="text-en">{{item.text}}</view>
+  </star-card>
+
+  <star-card wx:if="{{item.translation}}" title="中文翻译">
+    <view class="text-cn text-soft">{{item.translation}}</view>
+  </star-card>
+
+  <star-card title="参考音频" extra="{{item.refAudioUrl ? '可播放' : '未上传'}}">
+    <view class="ref-audio" bindtap="onPlayRef">
+      <view class="ref-audio__btn">▶</view>
+      <view class="ref-audio__hint text-soft">
+        {{item.refAudioUrl ? '点击播放老师范读' : '老师暂未上传参考音频'}}
+      </view>
+    </view>
+  </star-card>
+
+  <!-- 录音区 -->
+  <view class="recorder card">
+    <view class="recorder__title">{{ phase === 'recording' ? '正在录音…' :
+                                       phase === 'uploading' ? '上传中…' :
+                                       phase === 'scoring'   ? '评分中…' :
+                                       score                  ? '本题最近一次成绩' : '点击开始录音' }}</view>
+
+    <view class="recorder__timer">
+      <text wx:if="{{phase === 'recording'}}">{{elapsedSec}}s / {{maxSec}}s</text>
+      <text wx:else class="text-muted">最长 {{maxSec}} 秒</text>
+    </view>
+
+    <view class="rec-btn-wrap">
+      <view class="rec-btn rec-btn--{{phase}}" bindtap="onToggleRecord">
+        <view class="rec-btn__dot" wx:if="{{phase === 'recording'}}"></view>
+        <text wx:elif="{{phase === 'uploading' || phase === 'scoring'}}">…</text>
+        <text wx:else>●</text>
+      </view>
+    </view>
+
+    <view class="recorder__hint text-muted" wx:if="{{phase === 'idle' || phase === 'done' || phase === 'error'}}">
+      {{ score ? '点击重录' : '点击红色按钮开始，再次点击结束' }}
+    </view>
+    <view class="recorder__error" wx:if="{{phase === 'error'}}">{{errorMsg}}</view>
+
+    <view wx:if="{{score}}" class="score">
+      <view class="score__total">
+        <view class="score__num">{{score.score}}</view>
+        <view class="score__label text-muted">总分</view>
+      </view>
+      <view class="score__dims">
+        <view class="score__dim">
+          <view class="score__dim-num">{{score.fluency}}</view>
+          <view class="score__dim-label text-muted">流利度</view>
+        </view>
+        <view class="score__dim">
+          <view class="score__dim-num">{{score.integrity}}</view>
+          <view class="score__dim-label text-muted">完整度</view>
+        </view>
+        <view class="score__dim">
+          <view class="score__dim-num">{{score.pronunciation}}</view>
+          <view class="score__dim-label text-muted">发音</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="progress-row text-soft">
+    已完成 <text class="text-accent">{{scoredCount}}</text> / {{totalCount}} 题
+  </view>
+
+  <view class="nav-row">
+    <view class="nav-btn {{!hasPrev ? 'is-disabled' : ''}}" bindtap="goPrev">上一题</view>
+    <view wx:if="{{scoredCount >= totalCount}}" class="nav-btn nav-btn--primary" bindtap="goFinalize">整体提交</view>
+    <view wx:else class="nav-btn {{!hasNext ? 'is-disabled' : ''}}" bindtap="goNext">下一题</view>
+  </view>
+</view>
+
+<view wx:else class="page-container text-soft">加载中…</view>

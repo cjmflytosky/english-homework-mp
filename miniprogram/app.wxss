@@ -1,0 +1,89 @@
+/**
+ * 星光蓝主题全局样式
+ *   主色：#3D6BFF
+ *   辅色：#7AA7FF
+ *   深空背景：#0E1A4A
+ *   星点高光：#E9F0FF
+ *   文本：#FFFFFF / #C7D0EA
+ */
+page {
+  --color-primary: #3D6BFF;
+  --color-primary-soft: #7AA7FF;
+  --color-bg: #0E1A4A;
+  --color-bg-soft: #182A6E;
+  --color-surface: rgba(255, 255, 255, 0.08);
+  --color-surface-strong: rgba(255, 255, 255, 0.16);
+  --color-text: #FFFFFF;
+  --color-text-soft: #C7D0EA;
+  --color-text-muted: #7E8AB3;
+
+  background:
+    radial-gradient(circle at 20% 10%, rgba(122,167,255,0.25), transparent 40%),
+    radial-gradient(circle at 80% 0%, rgba(61,107,255,0.35), transparent 45%),
+    linear-gradient(180deg, #0E1A4A 0%, #0A1238 100%);
+  min-height: 100vh;
+  color: var(--color-text);
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+  font-size: 28rpx;
+}
+
+button { background: initial; }
+button:focus { outline: 0; }
+button::after { border: none; }
+
+/* 通用工具类 */
+.page-container {
+  padding: 40rpx 32rpx 60rpx;
+  box-sizing: border-box;
+}
+
+.title {
+  font-size: 44rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+}
+
+.subtitle {
+  font-size: 26rpx;
+  color: var(--color-text-soft);
+  margin-top: 8rpx;
+}
+
+.card {
+  background: var(--color-surface);
+  border: 2rpx solid rgba(255,255,255,0.12);
+  border-radius: 28rpx;
+  padding: 32rpx;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 12rpx 32rpx rgba(8, 16, 50, 0.35);
+}
+
+.primary-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 88rpx;
+  background: linear-gradient(135deg, #7AA7FF 0%, #3D6BFF 60%, #2C50D9 100%);
+  color: #FFFFFF;
+  border-radius: 44rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  letter-spacing: 2rpx;
+  box-shadow: 0 12rpx 28rpx rgba(61,107,255,0.45);
+}
+
+.ghost-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80rpx;
+  background: transparent;
+  color: var(--color-text-soft);
+  border: 2rpx solid rgba(255,255,255,0.25);
+  border-radius: 40rpx;
+  font-size: 28rpx;
+}
+
+.text-muted { color: var(--color-text-muted); }
+.text-soft  { color: var(--color-text-soft); }
+.text-accent{ color: var(--color-primary-soft); }

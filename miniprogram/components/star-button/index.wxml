@@ -1,0 +1,10 @@
+<button
+  class="star-btn {{type === 'ghost' ? 'star-btn--ghost' : 'star-btn--primary'}} {{disabled ? 'is-disabled' : ''}}"
+  open-type="{{openType}}"
+  disabled="{{disabled}}"
+  bindtap="onTap"
+  bindgetuserinfo="onGetUserInfo"
+  bindgetphonenumber="onGetPhoneNumber"
+  bindchooseavatar="onChooseAvatar">
+  <slot/>
+</button>

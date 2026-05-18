@@ -1,0 +1,73 @@
+<view class="page-container">
+  <block wx:if="{{submission}}">
+    <view class="hero">
+      <view class="hero__label text-soft">本次作业总分</view>
+      <view class="hero__score">{{submission.totalScore}}</view>
+      <view class="hero__grade">{{scoreLabel}}</view>
+      <view class="hero__remark text-soft">{{remark}}</view>
+    </view>
+
+    <view class="dim-row">
+      <view class="dim">
+        <view class="dim__num">{{submission.fluency}}</view>
+        <view class="dim__label text-muted">流利度</view>
+      </view>
+      <view class="dim">
+        <view class="dim__num">{{submission.integrity}}</view>
+        <view class="dim__label text-muted">完整度</view>
+      </view>
+      <view class="dim">
+        <view class="dim__num">{{submission.pronunciation}}</view>
+        <view class="dim__label text-muted">发音</view>
+      </view>
+    </view>
+
+    <star-card wx:if="{{submission.comment}}" title="老师点评">
+      <view class="comment">
+        <view class="comment__text">{{submission.comment.content}}</view>
+        <view class="comment__meta text-muted">
+          —— {{submission.comment.author.name}} · {{commentUpdatedAt}}
+        </view>
+      </view>
+    </star-card>
+
+    <star-card title="单题成绩">
+      <view wx:for="{{submission.items}}" wx:key="id" class="item-row">
+        <view class="item-row__no">{{index + 1}}</view>
+        <view class="item-row__score">{{item.score}}</view>
+        <view class="item-row__dims text-muted">
+          流 {{item.fluency}} · 完 {{item.integrity}} · 发 {{item.pronunciation}}
+        </view>
+      </view>
+    </star-card>
+
+    <star-card wx:if="{{ranking}}" title="班级排名" extra="共 {{ranking.totalScored}} 人">
+      <view wx:if="{{ranking.me}}" class="me-row">
+        <view class="me-row__rank">#{{ranking.me.rank}}</view>
+        <view class="me-row__name">{{ranking.me.nickname}} (我)</view>
+        <view class="me-row__score">{{ranking.me.totalScore}}</view>
+      </view>
+
+      <view class="rank-divider text-muted">前 {{ranking.top.length}} 名</view>
+
+      <view
+        wx:for="{{ranking.top}}"
+        wx:key="studentId"
+        class="rank-row {{item.isMe ? 'is-me' : ''}}">
+        <view class="rank-row__rank rank-row__rank--{{item.rank <= 3 ? 'top' : 'normal'}}">
+          {{item.rank}}
+        </view>
+        <view class="rank-row__name">{{item.nickname}}</view>
+        <view class="rank-row__score">{{item.totalScore}}</view>
+      </view>
+    </star-card>
+
+    <view class="actions">
+      <star-button type="ghost" bindtap="goTasks">返回作业列表</star-button>
+      <star-button bindtap="goHome">回到首页</star-button>
+    </view>
+  </block>
+
+  <view wx:elif="{{loading}}" class="text-soft empty">提交中…</view>
+  <view wx:else class="text-soft empty">暂无提交记录</view>
+</view>

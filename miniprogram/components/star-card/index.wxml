@@ -1,0 +1,9 @@
+<view class="star-card">
+  <view wx:if="{{title}}" class="star-card__header">
+    <text class="star-card__title">{{title}}</text>
+    <text wx:if="{{extra}}" class="star-card__extra">{{extra}}</text>
+  </view>
+  <view class="star-card__body">
+    <slot/>
+  </view>
+</view>

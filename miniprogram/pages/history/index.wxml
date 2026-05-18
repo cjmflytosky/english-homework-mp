@@ -1,0 +1,27 @@
+<view class="page-container">
+  <view class="header">
+    <view class="title">我的历史</view>
+    <view class="subtitle">点击查看本次作业的详细成绩</view>
+  </view>
+
+  <block wx:for="{{list}}" wx:key="id">
+    <view class="row" data-id="{{item.assignmentId}}" bindtap="goResult">
+      <view class="row__main">
+        <view class="row__title">{{item.homework.title}}</view>
+        <view class="row__meta text-soft">
+          <text>{{item.typeLabel}}</text>
+          <text class="dot">·</text>
+          <text>{{item.statusLabel}}</text>
+          <text class="dot">·</text>
+          <text>{{item.whenLabel}}</text>
+        </view>
+      </view>
+      <view class="row__score">
+        <text wx:if="{{item.totalScore != null}}">{{item.totalScore}}</text>
+        <text wx:else class="text-muted">—</text>
+      </view>
+    </view>
+  </block>
+
+  <view wx:if="{{!loading && list.length === 0}}" class="empty text-soft">暂无提交</view>
+</view>

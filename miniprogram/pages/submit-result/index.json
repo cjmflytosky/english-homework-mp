@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "作业结果",
+  "usingComponents": {
+    "star-card": "/components/star-card/index",
+    "star-button": "/components/star-button/index"
+  }
+}

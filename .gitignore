@@ -1,0 +1,63 @@
+# ================================================================
+# 根 .gitignore
+#   - 各子项目（backend / admin）有自己的 .gitignore 兜底
+#   - 这里收敛跨目录通用规则，避免提交体积 / 敏感信息泄露
+# ================================================================
+
+# ---------- 依赖 / 构建产物 ----------
+node_modules/
+**/node_modules/
+**/dist/
+**/build/
+**/.next/
+**/.nuxt/
+**/.cache/
+
+# ---------- 环境变量 / 本地配置（绝不入库） ----------
+.env
+.env.local
+.env.*.local
+!.env.example
+**/.env
+!**/.env.example
+
+# ---------- 日志 / 调试 ----------
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ---------- 编辑器 / 操作系统 ----------
+.DS_Store
+Thumbs.db
+ehthumbs.db
+.idea/
+.vscode/
+!.vscode/extensions.json
+*.swp
+*.swo
+*~
+
+# ---------- 后端运行时产物 ----------
+backend/uploads/
+backend/coverage/
+
+# ---------- 微信小程序开发者工具产物 ----------
+miniprogram_npm/
+project.private.config.json
+
+# ---------- 测试 / 覆盖率 ----------
+coverage/
+.nyc_output/
+
+# ---------- Prisma 临时文件 ----------
+**/prisma/*.db
+**/prisma/*.db-journal
+
+# ---------- 临时 / 杂项 ----------
+*.tgz
+*.zip
+tmp/
+.tmp/

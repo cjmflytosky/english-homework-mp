@@ -1,0 +1,110 @@
+.empty { text-align: center; padding: 120rpx 0; }
+
+.hero {
+  text-align: center;
+  padding: 56rpx 0 24rpx;
+}
+.hero__label { font-size: 26rpx; }
+.hero__score {
+  font-size: 140rpx; font-weight: 800; line-height: 1.1;
+  background: linear-gradient(135deg, #7AA7FF, #3D6BFF);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+.hero__grade {
+  display: inline-block;
+  margin-top: 8rpx;
+  padding: 4rpx 24rpx;
+  border-radius: 999rpx;
+  font-size: 28rpx; font-weight: 700;
+  background: rgba(122,167,255,0.18);
+  color: #7AA7FF;
+}
+.hero__remark { margin-top: 18rpx; font-size: 26rpx; padding: 0 32rpx; }
+
+.dim-row {
+  margin: 32rpx 0 24rpx;
+  display: flex; justify-content: space-around;
+  background: rgba(255,255,255,0.06);
+  border: 2rpx solid rgba(255,255,255,0.12);
+  border-radius: 24rpx;
+  padding: 24rpx 0;
+}
+.dim { text-align: center; }
+.dim__num { font-size: 38rpx; font-weight: 700; color: #FFFFFF; }
+.dim__label { font-size: 22rpx; margin-top: 4rpx; }
+
+.item-row {
+  display: flex; align-items: center; gap: 16rpx;
+  padding: 14rpx 0;
+  border-bottom: 1rpx solid rgba(255,255,255,0.08);
+  font-size: 26rpx;
+}
+.item-row:last-child { border-bottom: none; }
+.item-row__no {
+  width: 40rpx; height: 40rpx; border-radius: 50%;
+  background: rgba(255,255,255,0.10);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22rpx; color: #C7D0EA;
+}
+.item-row__score {
+  min-width: 70rpx;
+  font-weight: 700; color: #FFFFFF;
+}
+.item-row__dims { flex: 1; font-size: 22rpx; }
+
+.actions {
+  display: flex; flex-direction: column; gap: 16rpx;
+  margin-top: 32rpx;
+}
+
+/* ====== 排名 ====== */
+.me-row {
+  display: flex; align-items: center; gap: 16rpx;
+  padding: 18rpx 20rpx;
+  background: linear-gradient(135deg, rgba(122,167,255,0.35), rgba(61,107,255,0.35));
+  border-radius: 18rpx;
+}
+.me-row__rank { font-size: 30rpx; font-weight: 800; color: #FFFFFF; min-width: 60rpx; }
+.me-row__name { flex: 1; font-size: 28rpx; color: #FFFFFF; font-weight: 600; }
+.me-row__score {
+  font-size: 36rpx; font-weight: 800; color: #FFFFFF;
+}
+
+.rank-divider {
+  font-size: 22rpx; text-align: center;
+  margin: 18rpx 0 8rpx;
+  letter-spacing: 2rpx;
+}
+
+.rank-row {
+  display: flex; align-items: center; gap: 16rpx;
+  padding: 14rpx 4rpx;
+  border-bottom: 1rpx solid rgba(255,255,255,0.08);
+  font-size: 26rpx;
+}
+.rank-row:last-child { border-bottom: none; }
+.rank-row.is-me { background: rgba(122,167,255,0.10); border-radius: 12rpx; padding: 14rpx 12rpx; border-bottom: none; }
+.rank-row__rank {
+  width: 48rpx; height: 48rpx;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 22rpx;
+  background: rgba(255,255,255,0.10); color: #C7D0EA;
+}
+.rank-row__rank--top {
+  background: linear-gradient(135deg, #FFD27A, #FF8A3D);
+  color: #FFFFFF;
+}
+.rank-row__name { flex: 1; color: #FFFFFF; }
+.rank-row__score { font-weight: 700; color: #FFFFFF; }
+
+/* ====== 老师点评 ====== */
+.comment { padding: 8rpx 0; }
+.comment__text {
+  font-size: 28rpx;
+  line-height: 1.7;
+  color: #FFFFFF;
+  white-space: pre-wrap;
+}
+.comment__meta { font-size: 22rpx; margin-top: 12rpx; text-align: right; }

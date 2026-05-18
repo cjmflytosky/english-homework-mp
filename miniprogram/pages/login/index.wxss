@@ -1,0 +1,106 @@
+.login-page {
+  min-height: 100vh;
+  padding: 160rpx 48rpx 60rpx;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.stars { position: absolute; inset: 0; pointer-events: none; }
+.star {
+  position: absolute;
+  width: 8rpx; height: 8rpx;
+  background: #E9F0FF;
+  border-radius: 50%;
+  box-shadow: 0 0 16rpx #E9F0FF;
+  opacity: 0.6;
+}
+.star--a { top: 120rpx;  left: 80rpx;  width: 6rpx;  height: 6rpx; }
+.star--b { top: 220rpx;  right: 90rpx; width: 10rpx; height: 10rpx; opacity: 0.8; }
+.star--c { top: 360rpx;  left: 180rpx; width: 4rpx;  height: 4rpx; opacity: 0.7; }
+.star--d { top: 500rpx;  right: 60rpx; width: 6rpx;  height: 6rpx; opacity: 0.5; }
+
+.brand { text-align: center; margin-bottom: 80rpx; }
+.brand__logo {
+  display: inline-flex;
+  width: 120rpx; height: 120rpx;
+  align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #7AA7FF, #3D6BFF);
+  color: #fff;
+  font-size: 64rpx;
+  border-radius: 36rpx;
+  box-shadow: 0 18rpx 36rpx rgba(61,107,255,0.45);
+}
+.brand__name {
+  margin-top: 28rpx;
+  font-size: 48rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+}
+.brand__slogan {
+  margin-top: 12rpx;
+  font-size: 26rpx;
+  color: #C7D0EA;
+  letter-spacing: 2rpx;
+}
+
+.login-card {
+  margin-top: 60rpx;
+}
+.login-card__title {
+  font-size: 32rpx;
+  font-weight: 600;
+  margin-bottom: 32rpx;
+}
+
+.profile-row {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  margin-bottom: 40rpx;
+}
+.avatar-btn {
+  padding: 0;
+  margin: 0;
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+  overflow: hidden;
+  background: rgba(255,255,255,0.1);
+  border: 2rpx solid rgba(255,255,255,0.2);
+}
+.avatar {
+  width: 96rpx;
+  height: 96rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.avatar--placeholder {
+  color: #C7D0EA;
+  font-size: 22rpx;
+}
+.nickname-input {
+  flex: 1;
+  height: 80rpx;
+  padding: 0 24rpx;
+  background: rgba(255,255,255,0.08);
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  color: #FFFFFF;
+}
+
+.mock-row {
+  text-align: center;
+  margin-top: 24rpx;
+  color: #7AA7FF;
+  font-size: 26rpx;
+}
+
+.tip {
+  position: absolute;
+  bottom: 50rpx;
+  left: 0; right: 0;
+  text-align: center;
+  font-size: 22rpx;
+  color: #7E8AB3;
+}

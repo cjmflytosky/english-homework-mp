@@ -1,0 +1,29 @@
+.header { margin-bottom: 24rpx; }
+.empty { text-align: center; padding: 100rpx 0; }
+
+.row {
+  display: flex; align-items: center; gap: 20rpx;
+  background: rgba(255,255,255,0.08);
+  border: 2rpx solid rgba(255,255,255,0.12);
+  border-radius: 24rpx;
+  padding: 24rpx 28rpx;
+  margin-bottom: 18rpx;
+}
+.row__main { flex: 1; min-width: 0; }
+.row__title {
+  font-size: 28rpx; font-weight: 600;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.row__meta {
+  font-size: 22rpx; margin-top: 6rpx;
+  display: flex; align-items: center; gap: 8rpx; flex-wrap: wrap;
+}
+.dot { opacity: 0.5; }
+
+.row__score {
+  font-size: 44rpx; font-weight: 800;
+  background: linear-gradient(135deg,#7AA7FF,#3D6BFF);
+  -webkit-background-clip: text;
+  color: transparent;
+  min-width: 110rpx; text-align: right;
+}

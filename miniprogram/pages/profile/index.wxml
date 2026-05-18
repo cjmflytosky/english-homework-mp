@@ -1,0 +1,47 @@
+<view class="page-container">
+  <view class="profile-hero">
+    <view class="profile-hero__avatar">
+      <image wx:if="{{student.avatar}}" src="{{student.avatar}}"/>
+      <text wx:else>★</text>
+    </view>
+    <view class="profile-hero__info">
+      <view class="name">{{student.realName || student.nickname || '未命名同学'}}</view>
+      <view class="meta text-soft">学号：{{student.studentNo || '未绑定'}}</view>
+    </view>
+  </view>
+
+  <star-card title="我的班级">
+    <view wx:if="{{ classesLoading }}" class="muted">加载中…</view>
+    <block wx:elif="{{ classes.length > 0 }}">
+      <view wx:for="{{classes}}" wx:key="id" class="cls">
+        <view class="cls__main">
+          <view class="cls__name">{{item.class.name}}</view>
+          <view class="cls__meta text-muted">
+            <text wx:if="{{item.class.grade}}">{{item.class.grade}} · </text>
+            老师：{{item.class.owner.name}}
+          </view>
+        </view>
+      </view>
+    </block>
+    <view wx:else class="empty">
+      <view class="muted">你还没有被加入任何班级</view>
+      <view class="muted-sub">请联系老师把你加入班级，加入后才能看到作业</view>
+    </view>
+  </star-card>
+
+  <star-card title="账号">
+    <view class="kv"><text class="kv__k text-muted">openId</text><text class="kv__v">{{student.openId}}</text></view>
+    <view class="kv"><text class="kv__k text-muted">真实姓名</text><text class="kv__v">{{student.realName || '未填写'}}</text></view>
+    <view class="kv"><text class="kv__k text-muted">手机号</text><text class="kv__v">{{student.phone || '未绑定'}}</text></view>
+  </star-card>
+
+  <view class="entries">
+    <view class="entry" bindtap="goHistory">
+      <view class="entry__icon">📚</view>
+      <view class="entry__label">我的历史</view>
+      <view class="entry__arrow">›</view>
+    </view>
+  </view>
+
+  <star-button type="ghost" bindtap="onLogout">退出登录</star-button>
+</view>
