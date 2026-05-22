@@ -103,7 +103,11 @@ export class AuthService {
         '未配置微信 appid/secret，无法换取 openid（可启用 WECHAT_MOCK_LOGIN）',
       );
     }
-    const url = `https://api.weixin.qq.com/sns/jscode2session?appid=${appid}&secret=${secret}&js_code=${encodeURIComponent(
+    // 在微信云托管容器内，调微信 API 走 HTTP（云托管出口会代为鉴权透传）。
+    // 用 HTTPS 会触发 self-signed certificate 错误，因为云托管的内网代理证书
+    // 不在 Node 默认 CA 链里。开发环境（非云托管）需要把 USE_HTTPS_FOR_WX=1。
+    const protocol = process.env.USE_HTTPS_FOR_WX === '1' ? 'https' : 'http';
+    const url = `${protocol}://api.weixin.qq.com/sns/jscode2session?appid=${appid}&secret=${secret}&js_code=${encodeURIComponent(
       code,
     )}&grant_type=authorization_code`;
 
