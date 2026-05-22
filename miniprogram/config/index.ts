@@ -28,18 +28,16 @@ export const AppConfig = {
     env: 'prod-d0gu5qnfb52e318b3',
     /**
      * 云托管服务名称。callContainer 通过 X-WX-SERVICE 头标识本次调用要打到哪个服务。
-     * 注意：服务名替换为你部署 NestJS 后端的服务，目前云上跑的是 Express demo (express-o264)。
-     * 把后端代码覆盖到同一个服务后，此字段保持 'express-o264' 即可；
-     * 如果你新建了一个独立服务跑后端，改成新服务名。
+     * 当前指向独立 NestJS 后端服务 xc-homework-backend（旧 express-o264 demo 已废弃）。
      */
-    service: 'express-o264',
+    service: 'xc-homework-backend',
     /** 服务内部前缀，对应后端 globalPrefix=api */
     pathPrefix: '/api',
     /**
      * 文件上传需用云托管公网 HTTPS 域名（callContainer 不支持 multipart）。
      * 当前服务公网域名（从控制台「服务详情 → 公网访问」复制）：
      */
-    publicUploadUrl: 'https://express-o264-259108-7-1434176431.sh.run.tcloudbase.com',
+    publicUploadUrl: 'https://xc-homework-backend-259108-7-1434176431.sh.run.tcloudbase.com',
   },
 
   /** 请求超时（毫秒） */
