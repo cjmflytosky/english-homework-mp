@@ -34,6 +34,7 @@ export class SubmissionService {
       dto.homeworkItemId,
       studentId,
     );
+    if (!homeworkItem) throw new BadRequestException('题目不存在');
 
     // 触发评分（mock SOE）
     const evalRes = await this.speech.evaluate({

@@ -1,7 +1,7 @@
 # =====================================================================
 # 星创想英语作业 - NestJS 后端 / 微信云托管镜像
 #   多阶段构建：deps → builder → runner
-#   运行时启动：先跑 prisma migrate deploy，再启动 main.js
+#   启动流程：docker-entrypoint.sh → prisma db push → node dist/main.js
 # =====================================================================
 
 # ---------- 1) 安装依赖 + 生成 Prisma Client ----------
@@ -36,9 +36,10 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/package*.json ./
+COPY docker-entrypoint.sh ./docker-entrypoint.sh
+RUN chmod +x ./docker-entrypoint.sh
 
 # 云托管约定端口（也可通过环境变量 PORT 覆盖）
 EXPOSE 3000
 
-# 启动前自动跑 schema 迁移；失败立即退出，云托管会拉新版重启
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main.js"]
+CMD ["./docker-entrypoint.sh"]

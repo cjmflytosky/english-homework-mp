@@ -6,7 +6,14 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { PublishAssignmentDto } from './dto/publish-assignment.dto';
-import { AssignmentStatus } from '@prisma/client';
+
+// 学生端作业展示状态 —— 后端按当前时间动态推导，不存数据库
+export enum AssignmentStatus {
+  PENDING = 'PENDING',
+  IN_PROGRESS = 'IN_PROGRESS',
+  SUBMITTED = 'SUBMITTED',
+  EXPIRED = 'EXPIRED',
+}
 
 @Injectable()
 export class AssignmentService {

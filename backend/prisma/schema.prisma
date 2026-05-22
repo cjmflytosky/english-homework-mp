@@ -27,14 +27,6 @@ enum HomeworkType {
   RECITE  // 背诵
 }
 
-/// 作业分配状态（针对某个学生 / 班级）
-enum AssignmentStatus {
-  PENDING     // 待完成
-  IN_PROGRESS // 进行中
-  SUBMITTED   // 已提交
-  EXPIRED     // 已过期
-}
-
 /// 整体提交状态
 enum SubmissionStatus {
   DRAFT       // 草稿（还没全部录完）
