@@ -17,6 +17,15 @@ export interface SoeEvalResult {
 
 /**
  * 语音评测抽象层。
+ *
+ * ⚠️ MVP 阶段已下线：SubmissionService 不再调用 evaluate()。
+ *    数据库 Submission.totalScore / SubmissionItem.score 等字段保留为 null，
+ *    前端不展示分数。未来恢复评分时：
+ *      1) 接入腾讯云 SOE SDK 替换 mockEvaluate
+ *      2) 在 SubmissionService.uploadAndScoreItem 里恢复 speech.evaluate 调用
+ *      3) 在 SubmissionService.finalize 里恢复加权平均
+ *      4) 前端恢复分数字段展示
+ *
  *   SOE_MOCK=true：本地按文本长度/随机给出 70~98 的拟真分
  *   SOE_MOCK=false：留给后续接入腾讯云 SOE
  */

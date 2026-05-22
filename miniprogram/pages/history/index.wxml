@@ -1,7 +1,7 @@
 <view class="page-container">
   <view class="header">
     <view class="title">我的历史</view>
-    <view class="subtitle">点击查看本次作业的详细成绩</view>
+    <view class="subtitle">点击查看本次作业的提交详情</view>
   </view>
 
   <block wx:for="{{list}}" wx:key="id">
@@ -17,8 +17,9 @@
         </view>
       </view>
       <view class="row__score">
-        <text wx:if="{{item.totalScore != null}}">{{item.totalScore}}</text>
-        <text wx:else class="text-muted">—</text>
+        <text class="badge badge--{{item.status === 'SUBMITTED' ? 'done' : 'draft'}}">
+          {{item.statusLabel}}
+        </text>
       </view>
     </view>
   </block>

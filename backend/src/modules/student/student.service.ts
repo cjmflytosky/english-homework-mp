@@ -116,9 +116,7 @@ export class StudentService {
       recentSubmissions: student.submissions.map((s) => ({
         id: s.id,
         status: s.status,
-        totalScore: s.totalScore,
         submittedAt: s.submittedAt,
-        scoredAt: s.scoredAt,
         homework: s.assignment.homework,
       })),
     };

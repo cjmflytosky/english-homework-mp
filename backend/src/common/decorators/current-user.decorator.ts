@@ -7,7 +7,10 @@ import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 export interface JwtPayload {
   sub: string;            // 主体 id
   type: 'student' | 'admin';
-  role?: string;          // 仅 admin 有
+  /** AdminUser 的角色（SUPER_ADMIN/TEACHER），仅当 type=admin 时存在 */
+  role?: string;
+  /** Student 的小程序内角色（STUDENT/TEACHER/ADMIN），仅当 type=student 时存在 */
+  studentRole?: 'STUDENT' | 'TEACHER' | 'ADMIN';
 }
 
 export const CurrentUser = createParamDecorator(

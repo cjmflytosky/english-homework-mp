@@ -25,8 +25,7 @@
   <view class="recorder card">
     <view class="recorder__title">{{ phase === 'recording' ? '正在录音…' :
                                        phase === 'uploading' ? '上传中…' :
-                                       phase === 'scoring'   ? '评分中…' :
-                                       score                  ? '本题最近一次成绩' : '点击开始录音' }}</view>
+                                       score                  ? '本题已录制' : '点击开始录音' }}</view>
 
     <view class="recorder__timer">
       <text wx:if="{{phase === 'recording'}}">{{elapsedSec}}s / {{maxSec}}s</text>
@@ -36,7 +35,7 @@
     <view class="rec-btn-wrap">
       <view class="rec-btn rec-btn--{{phase}}" bindtap="onToggleRecord">
         <view class="rec-btn__dot" wx:if="{{phase === 'recording'}}"></view>
-        <text wx:elif="{{phase === 'uploading' || phase === 'scoring'}}">…</text>
+        <text wx:elif="{{phase === 'uploading'}}">…</text>
         <text wx:else>●</text>
       </view>
     </view>
@@ -46,30 +45,14 @@
     </view>
     <view class="recorder__error" wx:if="{{phase === 'error'}}">{{errorMsg}}</view>
 
-    <view wx:if="{{score}}" class="score">
-      <view class="score__total">
-        <view class="score__num">{{score.score}}</view>
-        <view class="score__label text-muted">总分</view>
-      </view>
-      <view class="score__dims">
-        <view class="score__dim">
-          <view class="score__dim-num">{{score.fluency}}</view>
-          <view class="score__dim-label text-muted">流利度</view>
-        </view>
-        <view class="score__dim">
-          <view class="score__dim-num">{{score.integrity}}</view>
-          <view class="score__dim-label text-muted">完整度</view>
-        </view>
-        <view class="score__dim">
-          <view class="score__dim-num">{{score.pronunciation}}</view>
-          <view class="score__dim-label text-muted">发音</view>
-        </view>
-      </view>
+    <view wx:if="{{score}}" class="recorded-tag">
+      <text class="recorded-tag__check">✓</text>
+      <text class="text-muted">时长 {{score.duration || '-'}} 秒</text>
     </view>
   </view>
 
   <view class="progress-row text-soft">
-    已完成 <text class="text-accent">{{scoredCount}}</text> / {{totalCount}} 题
+    已录制 <text class="text-accent">{{scoredCount}}</text> / {{totalCount}} 题
   </view>
 
   <view class="nav-row">

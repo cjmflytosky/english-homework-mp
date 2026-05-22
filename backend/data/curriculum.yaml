@@ -1,0 +1,92 @@
+# =====================================================================
+#  星创想英语作业 - 学期课程 / 作业定义
+# =====================================================================
+#
+# 本文件是整学期作业的「单一可信源」。容器启动时会自动跑：
+#   scripts/sync-curriculum.ts
+# 它读取本文件 → 幂等 upsert 到数据库的 Class / Homework / Assignment 表。
+# 修改后只需重新部署即可生效。
+#
+# 字段说明：
+#   semester           学期标记，仅用于阅读区分
+#   classes[].code     班级业务码（也用作小程序「加入班级」时学生输入的口令）
+#   classes[].name     展示名
+#   classes[].grade    年级（可选，用于分组展示）
+#
+#   homeworks[].code        作业唯一业务码（关键！upsert 用它定位）
+#   homeworks[].title       展示标题
+#   homeworks[].type        REPEAT（跟读）/ RECITE（背诵）
+#   homeworks[].description 可选，作业说明
+#   homeworks[].releaseAt   何时开始可见（ISO 时间或 "YYYY-MM-DD HH:MM"）
+#   homeworks[].dueAt       截止时间
+#   homeworks[].classes     发给哪些班（空数组 = 所有班级）
+#   homeworks[].items[].text         题目英文原文
+#   homeworks[].items[].translation  中文翻译（可选）
+#   homeworks[].items[].refAudioUrl  参考音频 URL（可选，COS 上传后填回）
+#
+# 删除作业：把 yaml 里那一项删掉后重新部署，sync 脚本会清理掉「不再列出」
+# 的 homework.code 对应的整个 Homework + Assignment + Submission（级联）。
+# ⚠️ 慎用：会丢失学生在该作业下的录音记录。
+
+semester: "2026-spring"
+
+# ---------------------------------------------------------------------
+# 管理员 / 老师白名单（首次启动唯一入口）
+#
+# 学生用微信登录后默认 role=STUDENT。要让某人变成 ADMIN/TEACHER：
+#   1) 让他在小程序登录一次（数据库里就会有这个 Student 记录）
+#   2) 去云托管 → 数据库 → student 表，复制他的 open_id
+#   3) 把 openId 填到下面
+#   4) 重新部署 → sync 会把他的 role 改成 ADMIN/TEACHER
+#   5) 他重新登录小程序拿新 JWT 即可进入老师端
+#
+# ⚠️ ADMIN 不要轻易给：他能再把别人升降级 role；先给自己 ADMIN 一个就够了
+# ---------------------------------------------------------------------
+admins:
+  # - openId: "ocf6X5_xxxxxxxxxxxxxxxxxxx"
+  #   role: ADMIN
+  #   name: "项目管理员"
+
+  # - openId: "ocf6X5_yyyyyyyyyyyyyyyyyyy"
+  #   role: TEACHER
+  #   name: "李老师"
+
+classes:
+  - code: "G3-1"
+    name: "三年级一班"
+    grade: "三年级"
+  - code: "G3-2"
+    name: "三年级二班"
+    grade: "三年级"
+
+homeworks:
+
+  - code: "u1-greetings"
+    title: "Unit 1 · Greetings"
+    type: REPEAT
+    description: "第一单元跟读练习，注意 Hello / Hi 的连读"
+    releaseAt: "2026-03-01 08:00"
+    dueAt: "2026-03-07 23:59"
+    classes: []                    # 空 = 发给所有班级
+    items:
+      - text: "Hello, how are you?"
+        translation: "你好，你好吗？"
+      - text: "I am fine, thank you. And you?"
+        translation: "我很好，谢谢，你呢？"
+      - text: "Nice to meet you."
+        translation: "很高兴见到你。"
+
+  - code: "u2-my-family"
+    title: "Unit 2 · My Family"
+    type: RECITE
+    description: "第二单元背诵：介绍家庭成员"
+    releaseAt: "2026-03-08 08:00"
+    dueAt: "2026-03-14 23:59"
+    classes: ["G3-1", "G3-2"]
+    items:
+      - text: "This is my father. He is a doctor."
+        translation: "这是我爸爸，他是一名医生。"
+      - text: "This is my mother. She is a teacher."
+        translation: "这是我妈妈，她是一名老师。"
+      - text: "I love my family very much."
+        translation: "我非常爱我的家人。"

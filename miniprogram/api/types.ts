@@ -18,6 +18,8 @@ export type AssignmentStatus =
   | 'SUBMITTED'
   | 'EXPIRED';
 
+export type StudentRole = 'STUDENT' | 'TEACHER' | 'ADMIN';
+
 export interface Student {
   id: string;
   openId: string;
@@ -26,6 +28,8 @@ export interface Student {
   realName?: string;
   studentNo?: string;
   phone?: string;
+  /** 小程序内角色：决定登录后进入学生 UI 还是老师 UI */
+  role: StudentRole;
   enabled: boolean;
   createdAt: string;
 }
@@ -88,10 +92,14 @@ export interface SubmissionItem {
   audioUrl?: string;
   duration?: number;
   status: ItemScoreStatus;
-  score?: number;
-  fluency?: number;
-  integrity?: number;
-  pronunciation?: number;
+  /** @deprecated MVP 阶段无评分，字段永远为 null。保留兼容旧数据。 */
+  score?: number | null;
+  /** @deprecated 同上 */
+  fluency?: number | null;
+  /** @deprecated 同上 */
+  integrity?: number | null;
+  /** @deprecated 同上 */
+  pronunciation?: number | null;
   createdAt: string;
 }
 
@@ -107,12 +115,17 @@ export interface Submission {
   assignmentId: string;
   studentId: string;
   status: SubmissionStatus;
-  totalScore?: number;
-  fluency?: number;
-  integrity?: number;
-  pronunciation?: number;
+  /** @deprecated MVP 阶段无评分，字段永远为 null */
+  totalScore?: number | null;
+  /** @deprecated */
+  fluency?: number | null;
+  /** @deprecated */
+  integrity?: number | null;
+  /** @deprecated */
+  pronunciation?: number | null;
   submittedAt?: string;
-  scoredAt?: string;
+  /** @deprecated MVP 阶段无评分 */
+  scoredAt?: string | null;
   items: SubmissionItem[];
   /** 阶段 5：老师点评（可能为 null） */
   comment?: TeacherCommentBrief | null;
@@ -124,29 +137,12 @@ export interface UploadResult {
   size: number;
 }
 
-// ===================== 阶段 4：排名 / 历史 =====================
-
-export interface RankingRow {
-  rank: number;
-  studentId: string;
-  nickname: string;
-  avatar?: string;
-  totalScore: number | null;
-  isMe: boolean;
-}
-
-export interface AssignmentRanking {
-  top: RankingRow[];
-  me: RankingRow | null;
-  totalScored: number;
-}
+// ===================== 历史 =====================
 
 export interface HistoryItem {
   id: string;
   status: SubmissionStatus;
-  totalScore: number | null;
   submittedAt: string | null;
-  scoredAt: string | null;
   assignmentId: string;
   homework: { id: string; title: string; type: HomeworkType };
 }

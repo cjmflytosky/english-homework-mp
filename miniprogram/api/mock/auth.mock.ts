@@ -14,6 +14,7 @@ export function fakeLogin(profile?: { nickname?: string; avatar?: string }): Log
     realName: undefined,
     studentNo: undefined,
     phone: undefined,
+    role: 'STUDENT',
     enabled: true,
     createdAt: new Date().toISOString(),
   };

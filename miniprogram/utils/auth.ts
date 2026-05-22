@@ -35,3 +35,7 @@ export function clearLoginState(): void {
 export function isLoggedIn(): boolean {
   return !!loadLoginState().token;
 }
+
+export function getCurrentStudent(): Student | null {
+  return loadLoginState().student;
+}

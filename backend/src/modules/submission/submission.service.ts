@@ -6,44 +6,29 @@ import {
 } from '@nestjs/common';
 import {
   ItemScoreStatus,
-  Prisma,
   SubmissionStatus,
 } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { SpeechService } from '../speech/speech.service';
 import { UploadItemDto } from './dto/upload-item.dto';
 
 @Injectable()
 export class SubmissionService {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly speech: SpeechService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   /**
-   * 提交某一题录音并触发评分；同一题再次提交会覆盖（重录）。
-   * 流程：
-   *   1) 校验 assignment + item 属于学生班级
-   *   2) upsert Submission（若不存在则 DRAFT）
-   *   3) 调 SpeechService 评分
-   *   4) upsert SubmissionItem 写入分数
+   * 提交某一题录音；同一题再次提交会覆盖（重录）。
+   *
+   * MVP 阶段不做自动评分（SOE 已下线），仅持久化录音 URL。
+   * 老师在小程序内通过 TeacherComment 给文字点评。
    */
   async uploadAndScoreItem(dto: UploadItemDto, studentId: string) {
-    const { assignment, homeworkItem } = await this.assertOwnership(
+    const { homeworkItem } = await this.assertOwnership(
       dto.assignmentId,
       dto.homeworkItemId,
       studentId,
     );
     if (!homeworkItem) throw new BadRequestException('题目不存在');
 
-    // 触发评分（mock SOE）
-    const evalRes = await this.speech.evaluate({
-      audioUrl: dto.audioUrl,
-      refText: homeworkItem.text,
-      type: assignment.homework.type,
-    });
-
-    // 用事务保证一致：先确保 Submission 存在，再 upsert 单题
     return this.prisma.$transaction(async (tx) => {
       const submission = await tx.submission.upsert({
         where: {
@@ -75,22 +60,13 @@ export class SubmissionService {
           homeworkItemId: dto.homeworkItemId,
           audioUrl: dto.audioUrl,
           duration: dto.duration,
+          // 不评分，直接标 DONE 表示「录音已收」
           status: ItemScoreStatus.DONE,
-          score: evalRes.score,
-          fluency: evalRes.fluency,
-          integrity: evalRes.integrity,
-          pronunciation: evalRes.pronunciation,
-          rawScoreJson: evalRes.raw as Prisma.InputJsonValue,
         },
         update: {
           audioUrl: dto.audioUrl,
           duration: dto.duration,
           status: ItemScoreStatus.DONE,
-          score: evalRes.score,
-          fluency: evalRes.fluency,
-          integrity: evalRes.integrity,
-          pronunciation: evalRes.pronunciation,
-          rawScoreJson: evalRes.raw as Prisma.InputJsonValue,
           errorMessage: null,
         },
       });
@@ -100,7 +76,10 @@ export class SubmissionService {
   }
 
   /**
-   * 学生整体提交，把所有 SubmissionItem 加权平均计算总分。
+   * 学生整体提交：检查所有题录满 → 标记为 SUBMITTED → 等老师点评。
+   *
+   * MVP 阶段不再计算总分（SOE 已下线），状态不会进入 SCORED；
+   * 「老师写完点评」≠「状态变更」，二者解耦。
    */
   async finalize(assignmentId: string, studentId: string) {
     const { assignment } = await this.assertOwnership(
@@ -113,54 +92,26 @@ export class SubmissionService {
       where: {
         assignmentId_studentId: { assignmentId, studentId },
       },
-      include: {
-        items: {
-          include: { homeworkItem: true },
-        },
-      },
+      include: { items: true },
     });
     if (!submission) {
       throw new BadRequestException('尚未录制任何一题');
     }
 
-    const items = submission.items;
-    const homeworkItems = await this.prisma.homeworkItem.findMany({
+    const totalItems = await this.prisma.homeworkItem.count({
       where: { homeworkId: assignment.homeworkId },
-      select: { id: true, score: true },
     });
-    if (items.length < homeworkItems.length) {
+    if (submission.items.length < totalItems) {
       throw new BadRequestException(
-        `还有 ${homeworkItems.length - items.length} 题未录制，无法整体提交`,
+        `还有 ${totalItems - submission.items.length} 题未录制，无法整体提交`,
       );
     }
 
-    // 加权平均（按 homeworkItem.score 权重）
-    const weightTotal = homeworkItems.reduce((s, i) => s + (i.score || 0), 0) || items.length;
-    const sum = items.reduce((acc, it) => {
-      const w = it.homeworkItem.score || 1;
-      acc.score += (it.score ?? 0) * w;
-      acc.fluency += (it.fluency ?? 0) * w;
-      acc.integrity += (it.integrity ?? 0) * w;
-      acc.pronunciation += (it.pronunciation ?? 0) * w;
-      return acc;
-    }, { score: 0, fluency: 0, integrity: 0, pronunciation: 0 });
-
-    const totalScore = round(sum.score / weightTotal);
-    const fluency = round(sum.fluency / weightTotal);
-    const integrity = round(sum.integrity / weightTotal);
-    const pronunciation = round(sum.pronunciation / weightTotal);
-
-    const now = new Date();
     return this.prisma.submission.update({
       where: { id: submission.id },
       data: {
-        status: SubmissionStatus.SCORED,
-        totalScore,
-        fluency,
-        integrity,
-        pronunciation,
-        submittedAt: now,
-        scoredAt: now,
+        status: SubmissionStatus.SUBMITTED,
+        submittedAt: new Date(),
       },
       include: { items: { orderBy: { createdAt: 'asc' } } },
     });
@@ -262,12 +213,8 @@ export class SubmissionService {
           id: true,
           studentId: true,
           status: true,
-          totalScore: true,
-          fluency: true,
-          integrity: true,
-          pronunciation: true,
           submittedAt: true,
-          scoredAt: true,
+          comment: { select: { id: true, updatedAt: true } },
           _count: { select: { items: true } },
         },
       }),
@@ -279,21 +226,23 @@ export class SubmissionService {
       return {
         student: m.student,
         submissionId: sub?.id ?? null,
-        status: sub?.status ?? null,    // null = 未开始
-        totalScore: sub?.totalScore ?? null,
-        fluency: sub?.fluency ?? null,
-        integrity: sub?.integrity ?? null,
-        pronunciation: sub?.pronunciation ?? null,
-        scoredItemCount: sub?._count.items ?? 0,
+        status: sub?.status ?? null,        // null = 未开始
+        recordedItemCount: sub?._count.items ?? 0,
         submittedAt: sub?.submittedAt ?? null,
+        hasComment: !!sub?.comment,         // 是否已点评
+        commentedAt: sub?.comment?.updatedAt ?? null,
       };
     });
 
-    // 已评分的排前面，按总分降序；其它按学号
+    // 排序：已提交未点评的排前面 → 已点评 → 未提交；同档内按学号
     rows.sort((a, b) => {
-      const sa = a.totalScore ?? -1;
-      const sb = b.totalScore ?? -1;
-      if (sa !== sb) return sb - sa;
+      const priority = (r: typeof a) =>
+        r.status === 'SUBMITTED' && !r.hasComment ? 0 :
+        r.status === 'SUBMITTED' && r.hasComment ? 1 :
+        r.status === 'DRAFT' ? 2 : 3;
+      const pa = priority(a);
+      const pb = priority(b);
+      if (pa !== pb) return pa - pb;
       return (a.student.studentNo ?? '').localeCompare(b.student.studentNo ?? '');
     });
 
@@ -340,12 +289,7 @@ export class SubmissionService {
     return {
       id: sub.id,
       status: sub.status,
-      totalScore: sub.totalScore,
-      fluency: sub.fluency,
-      integrity: sub.integrity,
-      pronunciation: sub.pronunciation,
       submittedAt: sub.submittedAt,
-      scoredAt: sub.scoredAt,
       student: sub.student,
       homework: {
         id: sub.assignment.homework.id,
@@ -364,7 +308,10 @@ export class SubmissionService {
     };
   }
 
-  /** 教师视角：某次作业的统计指标 */
+  /**
+   * 教师视角：某次作业的提交情况统计。
+   * MVP 阶段不含分数维度（SOE 已下线）。
+   */
   async getAssignmentStats(assignmentId: string) {
     const assignment = await this.prisma.assignment.findUnique({
       where: { id: assignmentId },
@@ -372,69 +319,26 @@ export class SubmissionService {
     });
     if (!assignment) throw new NotFoundException('作业不存在');
 
-    const [memberCount, submissions] = await this.prisma.$transaction([
+    const [memberCount, submissions, commentedCount] = await this.prisma.$transaction([
       this.prisma.classMember.count({ where: { classId: assignment.classId } }),
       this.prisma.submission.findMany({
         where: { assignmentId },
-        select: { status: true, totalScore: true },
+        select: { status: true },
+      }),
+      this.prisma.teacherComment.count({
+        where: { submission: { assignmentId } },
       }),
     ]);
 
     const submittedCount = submissions.filter(
-      (s) => s.status === SubmissionStatus.SUBMITTED || s.status === SubmissionStatus.SCORED,
+      (s) => s.status === SubmissionStatus.SUBMITTED,
     ).length;
-    const scoredCount = submissions.filter((s) => s.status === SubmissionStatus.SCORED).length;
-    const scored = submissions.filter((s) => s.totalScore != null);
-    const avgScore =
-      scored.length === 0
-        ? null
-        : round(
-            scored.reduce((acc, s) => acc + (s.totalScore ?? 0), 0) / scored.length,
-          );
-
-    // 分数段分布（0~59 / 60~69 / 70~79 / 80~89 / 90~100）
-    const buckets = [0, 0, 0, 0, 0];
-    scored.forEach((s) => {
-      const v = s.totalScore ?? 0;
-      const idx = v < 60 ? 0 : v < 70 ? 1 : v < 80 ? 2 : v < 90 ? 3 : 4;
-      buckets[idx] += 1;
-    });
 
     return {
-      memberCount,
-      submittedCount,
-      scoredCount,
-      avgScore,
-      buckets, // [0-59, 60-69, 70-79, 80-89, 90-100]
-    };
-  }
-
-  /** 学生视角：班级排名（同一作业内） */
-  async getAssignmentRanking(assignmentId: string, studentId: string) {
-    await this.assertOwnership(assignmentId, undefined, studentId);
-
-    const submissions = await this.prisma.submission.findMany({
-      where: { assignmentId, status: SubmissionStatus.SCORED, totalScore: { not: null } },
-      orderBy: { totalScore: 'desc' },
-      include: {
-        student: { select: { id: true, nickname: true, avatar: true, realName: true } },
-      },
-    });
-
-    const rows = submissions.map((s, idx) => ({
-      rank: idx + 1,
-      studentId: s.studentId,
-      nickname: s.student.realName || s.student.nickname || '同学',
-      avatar: s.student.avatar,
-      totalScore: s.totalScore,
-      isMe: s.studentId === studentId,
-    }));
-
-    const myRow = rows.find((r) => r.isMe) ?? null;
-    return {
-      top: rows.slice(0, 20), // 前 20 名
-      me: myRow,
-      totalScored: rows.length,
+      memberCount,        // 班级人数
+      submittedCount,     // 已提交人数
+      commentedCount,     // 已点评人数
+      pendingCount: submittedCount - commentedCount, // 待点评
     };
   }
 
@@ -444,15 +348,13 @@ export class SubmissionService {
       this.prisma.submission.count({ where: { studentId } }),
       this.prisma.submission.findMany({
         where: { studentId },
-        orderBy: [{ scoredAt: 'desc' }, { updatedAt: 'desc' }],
+        orderBy: [{ submittedAt: 'desc' }, { updatedAt: 'desc' }],
         skip: (page - 1) * pageSize,
         take: pageSize,
         select: {
           id: true,
           status: true,
-          totalScore: true,
           submittedAt: true,
-          scoredAt: true,
           assignment: {
             select: {
               id: true,
@@ -467,9 +369,7 @@ export class SubmissionService {
       data: rows.map((r) => ({
         id: r.id,
         status: r.status,
-        totalScore: r.totalScore,
         submittedAt: r.submittedAt,
-        scoredAt: r.scoredAt,
         assignmentId: r.assignment.id,
         homework: r.assignment.homework,
       })),
@@ -508,8 +408,4 @@ export class SubmissionService {
     }
     return { assignment, homeworkItem };
   }
-}
-
-function round(n: number): number {
-  return Math.round(n * 10) / 10;
 }

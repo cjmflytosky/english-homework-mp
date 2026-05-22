@@ -15,10 +15,17 @@ datasource db {
 // 枚举
 // =============================================
 
-/// 管理后台角色
+/// 管理后台角色（保留：未来若上 H5 后台仍可用）
 enum AdminRole {
   SUPER_ADMIN // 超管
   TEACHER     // 老师
+}
+
+/// 小程序内角色：登录后据此判断进入学生 UI 还是老师 UI
+enum StudentRole {
+  STUDENT     // 学生（默认）
+  TEACHER     // 老师
+  ADMIN       // 管理员（可升降级他人 role，可设置班级归属）
 }
 
 /// 作业类型：跟读 / 背诵
@@ -68,20 +75,23 @@ model AdminUser {
 }
 
 /// 学生（小程序用户，依赖微信 openId）
+/// 注：MVP 阶段「老师」也是 Student.role=TEACHER，统一走微信登录。
 model Student {
-  id          String   @id @default(cuid())
-  openId      String   @unique @map("open_id")
-  unionId     String?  @map("union_id")
+  id          String      @id @default(cuid())
+  openId      String      @unique @map("open_id")
+  unionId     String?     @map("union_id")
   nickname    String?
   avatar      String?
   /// 真实姓名（由老师在管理后台维护或学生绑定时填写）
-  realName    String?  @map("real_name")
+  realName    String?     @map("real_name")
   /// 学号
-  studentNo   String?  @map("student_no")
+  studentNo   String?     @map("student_no")
   phone       String?
-  enabled     Boolean  @default(true)
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt      @map("updated_at")
+  /// 小程序内角色（决定登录后进入学生 UI 还是老师 UI）
+  role        StudentRole @default(STUDENT)
+  enabled     Boolean     @default(true)
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt      @map("updated_at")
 
   classMembers ClassMember[]
   submissions  Submission[]
@@ -134,10 +144,12 @@ model ClassMember {
 
 model Homework {
   id          String       @id @default(cuid())
+  /// 业务唯一码（来自 curriculum.yaml），用于幂等 upsert；手工创建的作业可为空
+  code        String?      @unique
   title       String
   description String?      @db.Text
   type        HomeworkType @default(REPEAT)
-  /// 总分（评分系统使用，0~100）
+  /// 总分（评分系统使用，0~100）；MVP 阶段不展示分数，此字段无意义但保留
   totalScore  Int          @default(100) @map("total_score")
   createdById String       @map("created_by_id")
   createdBy   AdminUser    @relation("HomeworkCreator", fields: [createdById], references: [id])

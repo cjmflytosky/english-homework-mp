@@ -10,7 +10,7 @@ import {
   getMySubmission,
 } from '../../api/submission';
 
-type Phase = 'idle' | 'recording' | 'uploading' | 'scoring' | 'done' | 'error';
+type Phase = 'idle' | 'recording' | 'uploading' | 'done' | 'error';
 
 interface TaskContentData {
   item: HomeworkItem | null;
@@ -190,7 +190,6 @@ Page<TaskContentData, PageState>({
       const rec = await stopRecord();
       this.setData({ phase: 'uploading' });
       const upload = await uploadFile(rec.tempFilePath);
-      this.setData({ phase: 'scoring' });
       const { item: scored } = await uploadSubmissionItem({
         assignmentId: this.assignmentId,
         homeworkItemId: item.id,

@@ -51,7 +51,11 @@ export class AuthService {
     });
 
     // 阶段 5 起：登录不自动加班级，必须由老师在后台显式加入
-    const token = this.signToken({ sub: student.id, type: 'student' });
+    const token = this.signToken({
+      sub: student.id,
+      type: 'student',
+      studentRole: student.role,
+    });
     return { token, student };
   }
 

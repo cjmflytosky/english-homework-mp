@@ -41,9 +41,9 @@ Page<LoginData, Record<string, never>>({
         avatar: this.data.avatar || undefined,
       });
 
-      // 3) 持久化 + 跳首页
+      // 3) 持久化 + 按角色跳转
       saveLoginState(token, student);
-      wx.switchTab({ url: '/pages/home/index' });
+      this.gotoHomeByRole(student?.role);
     } catch (err) {
       // request.ts 已经弹了 toast，这里兜底打一条
       console.warn('[login] failed', err);
@@ -62,11 +62,24 @@ Page<LoginData, Record<string, never>>({
         nickname: this.data.nickname || '体验同学',
       });
       saveLoginState(token, student);
-      wx.switchTab({ url: '/pages/home/index' });
+      this.gotoHomeByRole(student?.role);
     } catch (err) {
       console.warn('[mock-login] failed', err);
     } finally {
       this.setData({ loading: false });
+    }
+  },
+
+  /**
+   * 根据角色跳转：
+   *   TEACHER / ADMIN → 老师首页（Day 4 实现，暂时占位）
+   *   STUDENT / undefined → 学生首页
+   */
+  gotoHomeByRole(role?: string) {
+    if (role === 'TEACHER' || role === 'ADMIN') {
+      wx.reLaunch({ url: '/pages/teacher-home/index' });
+    } else {
+      wx.switchTab({ url: '/pages/home/index' });
     }
   },
 });

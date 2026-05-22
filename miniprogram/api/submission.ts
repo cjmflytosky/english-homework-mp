@@ -1,7 +1,6 @@
 import { request } from '../utils/request';
 import { AppConfig } from '../config/index';
 import {
-  AssignmentRanking,
   HistoryItem,
   Submission,
   SubmissionItem,
@@ -10,7 +9,6 @@ import {
   mockUploadItem,
   mockFinalize,
   mockGetSubmission,
-  mockRanking,
   mockHistory,
 } from './mock/submission.mock';
 
@@ -54,23 +52,11 @@ export function getMySubmission(
   });
 }
 
-// ===================== 阶段 4 =====================
-
-export function getAssignmentRanking(
-  assignmentId: string,
-): Promise<AssignmentRanking> {
-  if (AppConfig.useMock) return Promise.resolve(mockRanking(assignmentId));
-  return request<AssignmentRanking>({
-    url: `/assignments/${assignmentId}/ranking`,
-  });
-}
-
 export function listMyHistory(
   page = 1,
   pageSize = 20,
 ): Promise<HistoryItem[]> {
   if (AppConfig.useMock) return Promise.resolve(mockHistory());
-  // 注意：后端用 meta 表示分页，request 默认只取 data
   return request<HistoryItem[]>({
     url: '/me/submissions',
     data: { page, pageSize },

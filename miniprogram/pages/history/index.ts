@@ -10,7 +10,7 @@ interface HistoryData {
 const STATUS_LABEL: Record<HistoryItem['status'], string> = {
   DRAFT: '进行中',
   SUBMITTED: '已提交',
-  SCORED: '已评分',
+  SCORED: '已提交', // MVP 阶段 SCORED 不会出现，万一旧数据残留显示为已提交
 };
 
 Page<HistoryData, Record<string, never>>({
@@ -32,11 +32,9 @@ Page<HistoryData, Record<string, never>>({
         ...r,
         typeLabel: r.homework.type === 'REPEAT' ? '跟读' : '背诵',
         statusLabel: STATUS_LABEL[r.status],
-        whenLabel: r.scoredAt
-          ? new Date(r.scoredAt).toLocaleString()
-          : r.submittedAt
-            ? new Date(r.submittedAt).toLocaleString()
-            : '—',
+        whenLabel: r.submittedAt
+          ? new Date(r.submittedAt).toLocaleString()
+          : '—',
       }));
       this.setData({ list: decorated });
     } catch (err) {

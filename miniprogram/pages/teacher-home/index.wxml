@@ -1,0 +1,20 @@
+<view class="page-container">
+  <view class="hero">
+    <view class="hero__label text-soft">{{role}}端</view>
+    <view class="hero__name">{{nickname}}</view>
+  </view>
+
+  <view class="card placeholder">
+    <view class="placeholder__title">老师端开发中</view>
+    <view class="placeholder__desc text-soft">
+      预计 Day 4 上线：
+      {{'\n'}}· 我管理的班级
+      {{'\n'}}· 学生提交列表
+      {{'\n'}}· 听录音并写点评
+    </view>
+  </view>
+
+  <view class="actions">
+    <star-button type="ghost" bindtap="onLogout">退出登录</star-button>
+  </view>
+</view>

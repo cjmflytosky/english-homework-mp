@@ -54,16 +54,6 @@ export class SubmissionController {
     return this.submission.getMyByAssignment(assignmentId, user.sub);
   }
 
-  /** 阶段 4：班级排名（同次作业内） */
-  @Get('assignments/:assignmentId/ranking')
-  assignmentRanking(
-    @Param('assignmentId') assignmentId: string,
-    @CurrentUser() user: JwtPayload,
-  ) {
-    this.assertStudent(user);
-    return this.submission.getAssignmentRanking(assignmentId, user.sub);
-  }
-
   /** 阶段 4：我的提交历史 */
   @Get('me/submissions')
   myHistory(@Query() q: PageQueryDto, @CurrentUser() user: JwtPayload) {
