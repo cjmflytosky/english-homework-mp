@@ -129,7 +129,7 @@ export class SubmissionService {
         items: { orderBy: { createdAt: 'asc' } },
         comment: {
           include: {
-            author: { select: { id: true, name: true } },
+            author: { select: { id: true, nickname: true, realName: true } },
           },
         },
       },
@@ -161,7 +161,7 @@ export class SubmissionService {
       create: { submissionId, authorId, content: trimmed },
       update: { content: trimmed, authorId },
       include: {
-        author: { select: { id: true, name: true } },
+        author: { select: { id: true, nickname: true, realName: true } },
       },
     });
   }
@@ -273,7 +273,7 @@ export class SubmissionService {
         items: true,
         comment: {
           include: {
-            author: { select: { id: true, name: true } },
+            author: { select: { id: true, nickname: true, realName: true } },
           },
         },
       },

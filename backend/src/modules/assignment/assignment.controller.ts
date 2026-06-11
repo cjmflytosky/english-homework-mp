@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  ForbiddenException,
   Get,
   Param,
   Post,
@@ -14,39 +13,45 @@ import {
   JwtPayload,
 } from '../../common/decorators/current-user.decorator';
 import { PageQueryDto } from '../../common/dto/page-query.dto';
+import {
+  assertAdmin,
+  assertStudent,
+  assertTeacherOrAdmin,
+} from '../../common/guards/role-helpers';
 
 @Controller()
 export class AssignmentController {
   constructor(private readonly assignment: AssignmentService) {}
 
-  // ---------------- 老师端 ----------------
+  // ---------------- 老师 / 管理员 ----------------
 
+  /** MVP：作业由 curriculum.yaml 同步发布；这个接口保留给未来 H5 后台或临时补发 */
   @Post('admin/assignments')
   publish(
     @Body() dto: PublishAssignmentDto,
     @CurrentUser() user: JwtPayload,
   ) {
-    if (user.type !== 'admin') throw new ForbiddenException('仅管理员可访问');
+    assertAdmin(user);
     return this.assignment.publish(dto, user.sub);
   }
 
   @Get('admin/assignments')
   listAdmin(@Query() q: PageQueryDto, @CurrentUser() user: JwtPayload) {
-    if (user.type !== 'admin') throw new ForbiddenException('仅管理员可访问');
+    assertTeacherOrAdmin(user);
     return this.assignment.listForAdmin({ page: q.page, pageSize: q.pageSize });
   }
 
-  // ---------------- 学生端 ----------------
+  // ---------------- 学生 ----------------
 
   @Get('assignments')
   listMine(@CurrentUser() user: JwtPayload) {
-    if (user.type !== 'student') throw new ForbiddenException('仅学生可访问');
+    assertStudent(user);
     return this.assignment.listForStudent(user.sub);
   }
 
   @Get('assignments/:id')
   detail(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
-    if (user.type !== 'student') throw new ForbiddenException('仅学生可访问');
+    assertStudent(user);
     return this.assignment.getForStudent(id, user.sub);
   }
 }

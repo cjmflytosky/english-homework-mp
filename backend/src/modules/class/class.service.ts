@@ -111,7 +111,7 @@ export class ClassService {
       assignmentCount: cls._count.assignments,
       createdAt: cls.createdAt,
       members: cls.members.map((m) => ({
-        id: m.id,
+        memberId: m.id,
         joinedAt: m.joinedAt,
         seatNo: m.seatNo,
         student: m.student,

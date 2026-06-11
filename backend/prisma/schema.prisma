@@ -69,7 +69,6 @@ model AdminUser {
   classes       Class[]          @relation("ClassOwner")
   homeworks     Homework[]       @relation("HomeworkCreator")
   assignments   Assignment[]     @relation("AssignmentCreator")
-  comments      TeacherComment[] @relation("TeacherCommentAuthor")
 
   @@map("admin_user")
 }
@@ -93,8 +92,10 @@ model Student {
   createdAt   DateTime    @default(now()) @map("created_at")
   updatedAt   DateTime    @updatedAt      @map("updated_at")
 
-  classMembers ClassMember[]
-  submissions  Submission[]
+  classMembers   ClassMember[]
+  submissions    Submission[]
+  /// 作为老师写过的点评
+  teacherComments TeacherComment[] @relation("TeacherCommentAuthor")
 
   @@index([openId])
   @@map("student")
@@ -272,6 +273,7 @@ model SubmissionItem {
 // =============================================
 
 /// 老师对某次提交的文字点评；一次提交只保留最新一条（覆盖式）
+/// MVP：老师即 Student.role=TEACHER，所以 authorId 关联 student 表
 model TeacherComment {
   id           String   @id @default(cuid())
   submissionId String   @unique @map("submission_id")
@@ -281,7 +283,7 @@ model TeacherComment {
   updatedAt    DateTime @updatedAt      @map("updated_at")
 
   submission   Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
-  author       AdminUser  @relation("TeacherCommentAuthor", fields: [authorId], references: [id])
+  author       Student    @relation("TeacherCommentAuthor", fields: [authorId], references: [id])
 
   @@index([authorId])
   @@map("teacher_comment")

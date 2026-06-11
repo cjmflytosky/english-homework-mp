@@ -62,6 +62,7 @@ export class StudentService {
       realName: s.realName,
       studentNo: s.studentNo,
       phone: s.phone,
+      role: s.role,
       enabled: s.enabled,
       submissionCount: s._count.submissions,
       classes: s.classMembers.map((m) => ({
@@ -140,6 +141,28 @@ export class StudentService {
         studentNo: true,
         phone: true,
         enabled: true,
+      },
+    });
+  }
+
+  /**
+   * 升降级他人 role（仅 ADMIN 调用，权限校验在 controller）。
+   * 升级后，目标用户需要重新登录才能拿到带新 role 的 JWT。
+   */
+  async updateRole(
+    id: string,
+    role: 'STUDENT' | 'TEACHER' | 'ADMIN',
+  ) {
+    const existing = await this.prisma.student.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException('学生不存在');
+    return this.prisma.student.update({
+      where: { id },
+      data: { role },
+      select: {
+        id: true,
+        nickname: true,
+        realName: true,
+        role: true,
       },
     });
   }
