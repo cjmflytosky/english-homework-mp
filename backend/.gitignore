@@ -4,3 +4,5 @@ dist
 *.log
 .DS_Store
 /uploads
+# tsc 增量缓存：残留会让 nest build 跳过 emit（dist 不生成），必须忽略
+tsconfig.tsbuildinfo
