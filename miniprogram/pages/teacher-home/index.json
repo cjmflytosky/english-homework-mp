@@ -2,5 +2,6 @@
   "navigationBarTitleText": "老师端",
   "usingComponents": {
     "star-button": "/components/star-button/index"
-  }
+  },
+  "enablePullDownRefresh": true
 }

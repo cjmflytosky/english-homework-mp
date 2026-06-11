@@ -6,18 +6,27 @@ interface ProfileData {
   student: Student | null;
   classes: JoinedClass[];
   classesLoading: boolean;
+  isTeacher: boolean;
 }
 
 Page<ProfileData, Record<string, never>>({
-  data: { student: null, classes: [], classesLoading: false },
+  data: { student: null, classes: [], classesLoading: false, isTeacher: false },
 
   onShow() {
     if (!isLoggedIn()) {
       wx.reLaunch({ url: '/pages/login/index' });
       return;
     }
-    this.setData({ student: loadLoginState().student });
+    const student = loadLoginState().student;
+    this.setData({
+      student,
+      isTeacher: student?.role === 'TEACHER' || student?.role === 'ADMIN',
+    });
     void this.loadClasses();
+  },
+
+  goTeacherHome() {
+    wx.reLaunch({ url: '/pages/teacher-home/index' });
   },
 
   async loadClasses() {

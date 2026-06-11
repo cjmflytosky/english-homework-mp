@@ -1,0 +1,60 @@
+<view class="page-container">
+  <view class="header">
+    <view class="header__title">管理员工具</view>
+    <view class="header__sub text-soft">搜索学生 → 升降级 / 加入班级</view>
+  </view>
+
+  <view class="search-row">
+    <input
+      class="search-input"
+      placeholder="输入昵称 / 真实姓名 / 学号"
+      value="{{keyword}}"
+      bindinput="onKeywordInput"
+      bindconfirm="onSearch"
+      confirm-type="search" />
+    <button class="search-btn" loading="{{searching}}" bindtap="onSearch">搜索</button>
+  </view>
+
+  <view wx:if="{{!searching && students.length === 0 && keyword}}" class="empty text-soft">
+    没找到匹配的学生
+  </view>
+
+  <view
+    wx:for="{{students}}"
+    wx:key="id"
+    class="row">
+    <image
+      wx:if="{{item.avatar}}"
+      class="row__avatar"
+      src="{{item.avatar}}" />
+    <view wx:else class="row__avatar row__avatar--placeholder">
+      {{item.realName || item.nickname || '?'}}
+    </view>
+
+    <view class="row__main">
+      <view class="row__name">
+        {{item.realName || item.nickname || '未命名'}}
+      </view>
+      <view class="row__meta text-soft">
+        <text>{{item.studentNo || '未设学号'}}</text>
+        <text class="dot">·</text>
+        <text class="role-badge role-badge--{{item.role}}">{{item.roleLabel}}</text>
+      </view>
+    </view>
+
+    <view class="row__actions">
+      <view
+        class="op-btn op-btn--role"
+        data-id="{{item.id}}"
+        bindtap="onChangeRole">
+        改 role
+      </view>
+      <view
+        class="op-btn op-btn--class"
+        data-id="{{item.id}}"
+        bindtap="onAddToClass">
+        加入班级
+      </view>
+    </view>
+  </view>
+</view>

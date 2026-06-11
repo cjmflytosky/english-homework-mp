@@ -8,7 +8,10 @@
     "pages/task-content/index",
     "pages/submit-result/index",
     "pages/history/index",
-    "pages/teacher-home/index"
+    "pages/teacher-home/index",
+    "pages/teacher-class/index",
+    "pages/teacher-review/index",
+    "pages/admin-tools/index"
   ],
   "window": {
     "backgroundColor": "#0E1A4A",

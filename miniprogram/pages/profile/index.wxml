@@ -41,6 +41,11 @@
       <view class="entry__label">我的历史</view>
       <view class="entry__arrow">›</view>
     </view>
+    <view wx:if="{{isTeacher}}" class="entry entry--teacher" bindtap="goTeacherHome">
+      <view class="entry__icon">👩‍🏫</view>
+      <view class="entry__label">切换到老师端</view>
+      <view class="entry__arrow">›</view>
+    </view>
   </view>
 
   <star-button type="ghost" bindtap="onLogout">退出登录</star-button>

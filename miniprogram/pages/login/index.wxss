@@ -96,6 +96,22 @@
   font-size: 26rpx;
 }
 
+/* 联调专用入口（上线前连同 wxml 中的 dev-row 一起删除） */
+.dev-row {
+  display: flex;
+  justify-content: center;
+  gap: 40rpx;
+  margin-top: 16rpx;
+}
+
+.dev-link {
+  color: #5C6B8A;
+  font-size: 24rpx;
+  padding: 8rpx 16rpx;
+  border: 1rpx dashed #3A4670;
+  border-radius: 12rpx;
+}
+
 .tip {
   position: absolute;
   bottom: 50rpx;

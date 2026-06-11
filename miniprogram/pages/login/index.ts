@@ -52,14 +52,19 @@ Page<LoginData, Record<string, never>>({
     }
   },
 
-  async onMockLogin() {
-    // 联调用：直接走 mock code（后端 WECHAT_MOCK_LOGIN=true 时生效）
+  /**
+   * 联调用：走 mock code（后端 WECHAT_MOCK_LOGIN=true 时生效）。
+   * data-code 指定固定账号（mock-teacher / mock-admin，见 prisma/seed.ts）；
+   * 不传则用一次性的体验学生账号（每次新建一个 STUDENT）。
+   */
+  async onMockLogin(e?: { currentTarget?: { dataset?: { code?: string } } }) {
     if (this.data.loading) return;
     this.setData({ loading: true });
     try {
-      const code = `mock-${Date.now()}`;
+      const fixed = e?.currentTarget?.dataset?.code;
+      const code = fixed || `mock-${Date.now()}`;
       const { token, student } = await wxLogin(code, {
-        nickname: this.data.nickname || '体验同学',
+        nickname: this.data.nickname || (fixed ? undefined : '体验同学'),
       });
       saveLoginState(token, student);
       this.gotoHomeByRole(student?.role);

@@ -1,0 +1,66 @@
+<view class="page-container" wx:if="{{submission}}">
+  <view class="header">
+    <view class="header__name">{{displayName}}</view>
+    <view class="header__meta text-soft">
+      <text>{{submission.homework.title}}</text>
+      <text class="dot">·</text>
+      <text>{{submission.homework.type === 'REPEAT' ? '跟读' : '背诵'}}</text>
+    </view>
+  </view>
+
+  <view class="section-title">逐题听录音</view>
+
+  <view
+    wx:for="{{items}}"
+    wx:key="id"
+    class="item-card">
+    <view class="item-card__head">
+      <view class="item-card__no">第 {{item.orderNo}} 题</view>
+      <view
+        class="play-btn play-btn--{{item.isPlaying ? 'playing' : ''}} {{!item.submission ? 'play-btn--disabled' : ''}}"
+        data-id="{{item.id}}"
+        data-url="{{item.submission.audioUrl}}"
+        bindtap="onPlay">
+        <text wx:if="{{item.isPlaying}}">⏸</text>
+        <text wx:else>▶</text>
+      </view>
+    </view>
+    <view class="item-card__text">{{item.text}}</view>
+    <view wx:if="{{item.translation}}" class="item-card__cn text-soft">{{item.translation}}</view>
+    <view wx:if="{{!item.submission}}" class="item-card__empty text-muted">学生还没录这一题</view>
+    <view wx:elif="{{item.submission.duration}}" class="item-card__dur text-muted">
+      录音时长 {{item.submission.duration}} 秒
+    </view>
+  </view>
+
+  <view class="section-title">老师点评</view>
+
+  <view wx:if="{{submission.comment}}" class="last-comment">
+    <view class="last-comment__head text-soft">
+      上次：{{authorName}} · {{commentTimeLabel}}
+    </view>
+    <view class="last-comment__text">{{submission.comment.content}}</view>
+  </view>
+
+  <textarea
+    class="comment-input"
+    placeholder="写下对这次作业的反馈…（再次提交将覆盖上次）"
+    value="{{commentInput}}"
+    bindinput="onCommentInput"
+    maxlength="500"
+    auto-height></textarea>
+
+  <view class="submit-row">
+    <view class="text-muted">{{commentInput.length}} / 500</view>
+    <button
+      class="submit-btn"
+      loading="{{submitting}}"
+      disabled="{{submitting || !commentInput}}"
+      bindtap="onSubmitComment">
+      保存点评
+    </button>
+  </view>
+</view>
+
+<view wx:elif="{{loading}}" class="text-soft empty">加载中…</view>
+<view wx:else class="text-soft empty">提交不存在</view>

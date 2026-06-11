@@ -1,0 +1,86 @@
+.page-container {
+  padding: 32rpx;
+  padding-bottom: 200rpx;
+  min-height: 100vh;
+  background: #f7f8fc;
+}
+
+.header { margin-bottom: 32rpx; }
+.header__name { font-size: 40rpx; font-weight: 600; color: #1a1f36; }
+.header__meta { font-size: 26rpx; margin-top: 8rpx; }
+.dot { margin: 0 10rpx; }
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #5a6071;
+  margin: 24rpx 0 16rpx 8rpx;
+}
+
+.item-card {
+  padding: 28rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  margin-bottom: 16rpx;
+}
+.item-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+.item-card__no { font-size: 26rpx; color: #7e8ab3; }
+.item-card__text { font-size: 32rpx; color: #1a1f36; line-height: 1.5; }
+.item-card__cn   { font-size: 26rpx; margin-top: 8rpx; }
+.item-card__empty { font-size: 24rpx; margin-top: 8rpx; font-style: italic; }
+.item-card__dur   { font-size: 22rpx; margin-top: 8rpx; }
+
+.play-btn {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: #3d6bff;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+}
+.play-btn--playing { background: #ff8a3d; }
+.play-btn--disabled { background: #c5c9d6; pointer-events: none; }
+
+.last-comment {
+  padding: 24rpx;
+  background: #fff7e6;
+  border-radius: 12rpx;
+  margin-bottom: 16rpx;
+}
+.last-comment__head { font-size: 22rpx; }
+.last-comment__text { font-size: 28rpx; margin-top: 8rpx; line-height: 1.6; color: #1a1f36; }
+
+.comment-input {
+  width: 100%;
+  min-height: 200rpx;
+  padding: 24rpx;
+  background: #fff;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+}
+
+.submit-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24rpx;
+}
+.submit-btn {
+  background: #3d6bff;
+  color: #fff;
+  font-size: 28rpx;
+  border-radius: 12rpx;
+  padding: 0 48rpx;
+}
+.submit-btn[disabled] { background: #c5c9d6; }
+
+.empty { padding: 120rpx 0; text-align: center; }

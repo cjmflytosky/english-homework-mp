@@ -1,16 +1,57 @@
 <view class="page-container">
   <view class="hero">
-    <view class="hero__label text-soft">{{role}}端</view>
+    <view class="hero__label text-soft">{{roleLabel}}端</view>
     <view class="hero__name">{{nickname}}</view>
   </view>
 
-  <view class="card placeholder">
-    <view class="placeholder__title">老师端开发中</view>
-    <view class="placeholder__desc text-soft">
-      预计 Day 4 上线：
-      {{'\n'}}· 我管理的班级
-      {{'\n'}}· 学生提交列表
-      {{'\n'}}· 听录音并写点评
+  <view wx:if="{{isAdmin}}" class="admin-shortcut" bindtap="goAdminTools">
+    <view class="admin-shortcut__icon">⚙</view>
+    <view class="admin-shortcut__text">
+      <view class="admin-shortcut__title">管理员工具</view>
+      <view class="admin-shortcut__desc text-soft">升降级角色 · 加学生入班</view>
+    </view>
+    <view class="admin-shortcut__arrow">›</view>
+  </view>
+
+  <view class="section-title">待批改作业（{{assignments.length}}）</view>
+
+  <view wx:if="{{loading && assignments.length === 0}}" class="text-soft empty">加载中…</view>
+  <view wx:if="{{!loading && assignments.length === 0}}" class="text-soft empty">
+    暂无作业。作业由系统按 curriculum 自动发布。
+  </view>
+
+  <view
+    wx:for="{{assignments}}"
+    wx:key="id"
+    class="assignment-card"
+    data-id="{{item.id}}"
+    bindtap="goAssignment">
+    <view class="assignment-card__title">{{item.homework.title}}</view>
+    <view class="assignment-card__meta text-soft">
+      <text>{{item.class.name}}</text>
+      <text class="dot">·</text>
+      <text>{{item.homework.type === 'REPEAT' ? '跟读' : '背诵'}}</text>
+      <text class="dot">·</text>
+      <text>{{item.dateRange}}</text>
+    </view>
+  </view>
+
+  <view class="section-title">我管理的班级（{{classes.length}}）</view>
+
+  <view wx:if="{{!loading && classes.length === 0}}" class="text-soft empty">
+    暂无班级。{{isAdmin ? '可在管理员工具里创建/查看。' : '请联系管理员把你加到班级。'}}
+  </view>
+
+  <view
+    wx:for="{{classes}}"
+    wx:key="id"
+    wx:for-index="idx"
+    class="class-card">
+    <view class="class-card__name">{{item.name}}</view>
+    <view class="class-card__meta text-soft">
+      <text>{{item.grade || '未设年级'}}</text>
+      <text class="dot">·</text>
+      <text>口令 {{item.inviteCode}}</text>
     </view>
   </view>
 

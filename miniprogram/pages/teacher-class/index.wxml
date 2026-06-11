@@ -1,0 +1,50 @@
+<view class="page-container">
+  <view class="header">
+    <view class="header__title">{{title}}</view>
+    <view class="header__meta text-soft">{{className}} · {{typeLabel}}</view>
+  </view>
+
+  <view wx:if="{{stats}}" class="stats">
+    <view class="stat">
+      <view class="stat__num">{{stats.memberCount}}</view>
+      <view class="stat__label text-soft">班级人数</view>
+    </view>
+    <view class="stat">
+      <view class="stat__num">{{stats.submittedCount}}</view>
+      <view class="stat__label text-soft">已提交</view>
+    </view>
+    <view class="stat stat--highlight">
+      <view class="stat__num">{{stats.pendingCount}}</view>
+      <view class="stat__label text-soft">待点评</view>
+    </view>
+    <view class="stat">
+      <view class="stat__num">{{stats.commentedCount}}</view>
+      <view class="stat__label text-soft">已点评</view>
+    </view>
+  </view>
+
+  <view wx:if="{{loading && rows.length === 0}}" class="empty text-soft">加载中…</view>
+  <view wx:elif="{{!loading && rows.length === 0}}" class="empty text-soft">
+    班级里还没有学生
+  </view>
+
+  <view
+    wx:for="{{rows}}"
+    wx:key="student.id"
+    class="row {{item.statusClass === 'pending' ? 'row--pending' : ''}}"
+    data-sid="{{item.submissionId}}"
+    bindtap="goReview">
+    <image
+      class="row__avatar"
+      wx:if="{{item.student.avatar}}"
+      src="{{item.student.avatar}}" />
+    <view wx:else class="row__avatar row__avatar--placeholder">
+      {{item.displayName[0]}}
+    </view>
+    <view class="row__main">
+      <view class="row__name">{{item.displayName}}</view>
+      <view class="row__no text-soft">{{item.student.studentNo || '未设学号'}}</view>
+    </view>
+    <view class="row__status row__status--{{item.statusClass}}">{{item.statusLabel}}</view>
+  </view>
+</view>

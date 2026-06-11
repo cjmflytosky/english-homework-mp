@@ -11,37 +11,50 @@
   color: #fff;
   margin-bottom: 32rpx;
 }
+.hero__label { font-size: 24rpx; opacity: 0.8; }
+.hero__name  { font-size: 48rpx; font-weight: 600; margin-top: 16rpx; }
 
-.hero__label {
-  font-size: 24rpx;
-  opacity: 0.8;
+.admin-shortcut {
+  display: flex;
+  align-items: center;
+  padding: 28rpx 32rpx;
+  background: #fff;
+  border-radius: 20rpx;
+  margin-bottom: 32rpx;
+  border-left: 6rpx solid #ff8a3d;
 }
+.admin-shortcut__icon { font-size: 40rpx; margin-right: 24rpx; }
+.admin-shortcut__text { flex: 1; }
+.admin-shortcut__title { font-size: 30rpx; font-weight: 600; color: #1a1f36; }
+.admin-shortcut__desc  { font-size: 24rpx; margin-top: 6rpx; }
+.admin-shortcut__arrow { font-size: 40rpx; color: #c5c9d6; }
 
-.hero__name {
-  font-size: 48rpx;
+.section-title {
+  font-size: 28rpx;
   font-weight: 600;
-  margin-top: 16rpx;
+  color: #5a6071;
+  margin: 24rpx 0 16rpx 8rpx;
 }
 
-.placeholder {
-  padding: 48rpx 32rpx;
+.empty { padding: 32rpx 0; text-align: center; }
+
+.assignment-card {
+  padding: 24rpx 28rpx;
   background: #fff;
   border-radius: 16rpx;
-}
-
-.placeholder__title {
-  font-size: 36rpx;
-  font-weight: 600;
-  color: #1a1f36;
   margin-bottom: 16rpx;
 }
+.assignment-card__title { font-size: 30rpx; font-weight: 500; color: #1a1f36; }
+.assignment-card__meta  { font-size: 24rpx; margin-top: 10rpx; }
+.dot { margin: 0 10rpx; }
 
-.placeholder__desc {
-  font-size: 28rpx;
-  line-height: 1.8;
-  white-space: pre-line;
+.class-card {
+  padding: 24rpx 28rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  margin-bottom: 16rpx;
 }
+.class-card__name { font-size: 30rpx; font-weight: 500; color: #1a1f36; }
+.class-card__meta { font-size: 24rpx; margin-top: 10rpx; }
 
-.actions {
-  margin-top: 48rpx;
-}
+.actions { margin-top: 48rpx; }
