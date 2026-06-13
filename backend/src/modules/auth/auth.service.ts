@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -22,6 +23,8 @@ interface WxSession {
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
@@ -51,6 +54,9 @@ export class AuthService {
     });
 
     // 阶段 5 起：登录不自动加班级，必须由老师在后台显式加入
+    this.logger.log(
+      `[wx-login] openId=${openId} studentId=${student.id} role=${student.role}`,
+    );
     const token = this.signToken({
       sub: student.id,
       type: 'student',

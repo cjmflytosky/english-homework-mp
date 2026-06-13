@@ -16,6 +16,7 @@ export class UserService {
         realName: true,
         studentNo: true,
         phone: true,
+        role: true,
         enabled: true,
         createdAt: true,
       },
