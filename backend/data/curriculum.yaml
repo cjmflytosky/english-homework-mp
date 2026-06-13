@@ -43,15 +43,18 @@ semester: "2026-spring"
 # ⚠️ ADMIN 不要轻易给：他能再把别人升降级 role；先给自己 ADMIN 一个就够了
 # ---------------------------------------------------------------------
 admins:
-  # - openId: "ocf6X5_xxxxxxxxxxxxxxxxxxx"
-  #   role: ADMIN
-  #   name: "项目管理员"
+  - openId: "ouEM43c58NPiFm-ui1bidx1FWSrQ"
+    role: ADMIN
+    name: "项目管理员"
 
   # - openId: "ocf6X5_yyyyyyyyyyyyyyyyyyy"
   #   role: TEACHER
   #   name: "李老师"
 
 classes:
+  - code: "DEFAULT"                 # seed 建的默认班；学生须由老师/管理员在后台加入
+    name: "默认班级"
+    grade: "全体"
   - code: "G3-1"
     name: "三年级一班"
     grade: "三年级"
@@ -60,6 +63,18 @@ classes:
     grade: "三年级"
 
 homeworks:
+
+  # —— 录音上传联调用，验证通过后可删除这一条再重新部署 ——
+  - code: "test-recording"
+    title: "录音上传测试"
+    type: REPEAT
+    description: "用于验证录音上传到 COS 的临时作业，跟读下面任意一句即可"
+    releaseAt: "2026-06-01 00:00"
+    dueAt: "2026-12-31 23:59"       # 窗口覆盖今天，状态为进行中可录音
+    classes: ["DEFAULT"]            # 只发默认班，学生登录即可见
+    items:
+      - text: "Hello, this is a recording test."
+        translation: "你好，这是一次录音测试。"
 
   - code: "u1-greetings"
     title: "Unit 1 · Greetings"
