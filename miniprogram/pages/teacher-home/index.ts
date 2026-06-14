@@ -88,6 +88,13 @@ Page<TeacherHomeData, Record<string, never>>({
     wx.navigateTo({ url: '/pages/class-manage/index' });
   },
 
+  goClass(e: { currentTarget: { dataset: { id: string; name: string } } }) {
+    const { id, name } = e.currentTarget.dataset;
+    wx.navigateTo({
+      url: `/pages/class-students/index?classId=${id}&name=${encodeURIComponent(name)}`,
+    });
+  },
+
   onLogout() {
     clearLoginState();
     wx.reLaunch({ url: '/pages/login/index' });

@@ -54,14 +54,19 @@
   <view
     wx:for="{{classes}}"
     wx:key="id"
-    wx:for-index="idx"
-    class="class-card">
-    <view class="class-card__name">{{item.name}}</view>
-    <view class="class-card__meta text-soft">
-      <text>{{item.grade || '未设年级'}}</text>
-      <text class="dot">·</text>
-      <text>口令 {{item.inviteCode}}</text>
+    class="class-card"
+    data-id="{{item.id}}"
+    data-name="{{item.name}}"
+    bindtap="goClass">
+    <view class="class-card__main">
+      <view class="class-card__name">{{item.name}}</view>
+      <view class="class-card__meta text-soft">
+        <text>{{item.grade || '未设年级'}}</text>
+        <text class="dot">·</text>
+        <text>口令 {{item.inviteCode}}</text>
+      </view>
     </view>
+    <view class="class-card__arrow">›</view>
   </view>
 
   <view class="actions">
