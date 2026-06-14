@@ -133,6 +133,30 @@ export class ClassService {
     });
   }
 
+  /**
+   * 删除班级。安全约束（避免误删丢数据）：
+   *   - 默认班级不可删
+   *   - 班级内还有学生或作业时不可删，须先清空
+   */
+  async remove(id: string) {
+    const cls = await this.prisma.class.findUnique({
+      where: { id },
+      select: {
+        inviteCode: true,
+        _count: { select: { members: true, assignments: true } },
+      },
+    });
+    if (!cls) throw new NotFoundException('班级不存在');
+    if (cls.inviteCode === DEFAULT_INVITE_CODE) {
+      throw new BadRequestException('默认班级不可删除');
+    }
+    if (cls._count.members > 0 || cls._count.assignments > 0) {
+      throw new BadRequestException('班级内仍有学生或作业，请先清空后再删除');
+    }
+    await this.prisma.class.delete({ where: { id } });
+    return { id };
+  }
+
   async rotateInviteCode(id: string) {
     const cls = await this.ensureExists(id);
     if (cls.inviteCode === DEFAULT_INVITE_CODE) {

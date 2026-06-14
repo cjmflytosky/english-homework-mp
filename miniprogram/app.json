@@ -11,7 +11,8 @@
     "pages/teacher-home/index",
     "pages/teacher-class/index",
     "pages/teacher-review/index",
-    "pages/admin-tools/index"
+    "pages/admin-tools/index",
+    "pages/class-manage/index"
   ],
   "window": {
     "backgroundColor": "#0E1A4A",

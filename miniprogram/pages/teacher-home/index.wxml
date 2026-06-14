@@ -13,6 +13,15 @@
     <view class="admin-shortcut__arrow">›</view>
   </view>
 
+  <view wx:if="{{isAdmin}}" class="admin-shortcut" bindtap="goClassManage">
+    <view class="admin-shortcut__icon">🏫</view>
+    <view class="admin-shortcut__text">
+      <view class="admin-shortcut__title">班级管理</view>
+      <view class="admin-shortcut__desc text-soft">新建 · 编辑 · 删除班级</view>
+    </view>
+    <view class="admin-shortcut__arrow">›</view>
+  </view>
+
   <view class="section-title">待批改作业（{{assignments.length}}）</view>
 
   <view wx:if="{{loading && assignments.length === 0}}" class="text-soft empty">加载中…</view>

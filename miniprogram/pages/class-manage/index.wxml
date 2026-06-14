@@ -1,0 +1,79 @@
+<view class="page-container">
+  <view class="header">
+    <view class="header__title">班级管理</view>
+    <view class="header__sub text-soft">新建 / 编辑 / 删除班级</view>
+  </view>
+
+  <view class="create-btn" bindtap="openCreate">＋ 新建班级</view>
+
+  <view wx:if="{{loading && classes.length === 0}}" class="empty text-soft">加载中…</view>
+  <view wx:if="{{!loading && classes.length === 0}}" class="empty text-soft">
+    还没有班级，点上方「新建班级」
+  </view>
+
+  <view wx:for="{{classes}}" wx:key="id" class="row">
+    <view class="row__main">
+      <view class="row__name">{{item.name}}</view>
+      <view class="row__meta text-soft">
+        <text>{{item.grade || '未设年级'}}</text>
+        <text class="dot">·</text>
+        <text>口令 {{item.inviteCode}}</text>
+      </view>
+      <view class="row__meta text-soft">
+        <text>{{item.memberCount || 0}} 名学生</text>
+        <text class="dot">·</text>
+        <text>{{item.assignmentCount || 0}} 个作业</text>
+      </view>
+    </view>
+    <view class="row__actions">
+      <view class="op-btn op-btn--edit" data-id="{{item.id}}" bindtap="openEdit">编辑</view>
+      <view
+        class="op-btn op-btn--del"
+        data-id="{{item.id}}"
+        data-name="{{item.name}}"
+        bindtap="onDelete">删除</view>
+    </view>
+  </view>
+</view>
+
+<!-- 新建 / 编辑 表单弹层 -->
+<view wx:if="{{showForm}}" class="mask" bindtap="closeForm">
+  <view class="sheet" catchtap="noop">
+    <view class="sheet__title">{{formTitle}}</view>
+
+    <view class="field">
+      <view class="field__label">班级名称</view>
+      <input
+        class="field__input"
+        placeholder="如 三年级一班"
+        value="{{form.name}}"
+        maxlength="40"
+        bindinput="onNameInput" />
+    </view>
+    <view class="field">
+      <view class="field__label">年级（可选）</view>
+      <input
+        class="field__input"
+        placeholder="如 三年级"
+        value="{{form.grade}}"
+        maxlength="20"
+        bindinput="onGradeInput" />
+    </view>
+    <view class="field">
+      <view class="field__label">备注（可选）</view>
+      <input
+        class="field__input"
+        placeholder="班级说明"
+        value="{{form.remark}}"
+        maxlength="200"
+        bindinput="onRemarkInput" />
+    </view>
+
+    <view class="sheet__actions">
+      <view class="sheet-btn sheet-btn--ghost" bindtap="closeForm">取消</view>
+      <view
+        class="sheet-btn sheet-btn--primary {{submitting ? 'is-disabled' : ''}}"
+        bindtap="submitForm">{{submitting ? '保存中…' : '保存'}}</view>
+    </view>
+  </view>
+</view>

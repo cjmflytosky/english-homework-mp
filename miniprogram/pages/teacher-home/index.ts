@@ -84,6 +84,10 @@ Page<TeacherHomeData, Record<string, never>>({
     wx.navigateTo({ url: '/pages/admin-tools/index' });
   },
 
+  goClassManage() {
+    wx.navigateTo({ url: '/pages/class-manage/index' });
+  },
+
   onLogout() {
     clearLoginState();
     wx.reLaunch({ url: '/pages/login/index' });

@@ -61,6 +61,12 @@ export class ClassController {
     return this.cls.update(id, dto);
   }
 
+  @Delete(':id')
+  remove(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    assertAdmin(user);
+    return this.cls.remove(id);
+  }
+
   @Post(':id/invite-code/rotate')
   rotate(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
     assertAdmin(user);

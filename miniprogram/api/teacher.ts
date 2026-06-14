@@ -17,6 +17,8 @@ export interface TeacherClassRow {
   enabled: boolean;
   /** 班级人数（如果后端返回） */
   memberCount?: number;
+  /** 已派发作业数（如果后端返回） */
+  assignmentCount?: number;
 }
 
 export function listClassesForTeacher(
@@ -26,6 +28,42 @@ export function listClassesForTeacher(
   return request<TeacherClassRow[]>({
     url: '/admin/classes',
     data: { page, pageSize },
+  });
+}
+
+// ---------------------- 班级增删改（仅 ADMIN） ----------------------
+
+export interface UpsertClassPayload {
+  name: string;
+  grade?: string;
+  remark?: string;
+}
+
+export function createClass(
+  payload: UpsertClassPayload,
+): Promise<TeacherClassRow> {
+  return request<TeacherClassRow>({
+    url: '/admin/classes',
+    method: 'POST',
+    data: { ...payload },
+  });
+}
+
+export function updateClass(
+  classId: string,
+  payload: Partial<UpsertClassPayload> & { enabled?: boolean },
+): Promise<TeacherClassRow> {
+  return request<TeacherClassRow>({
+    url: `/admin/classes/${classId}`,
+    method: 'PATCH',
+    data: { ...payload },
+  });
+}
+
+export function deleteClass(classId: string): Promise<{ id: string }> {
+  return request<{ id: string }>({
+    url: `/admin/classes/${classId}`,
+    method: 'DELETE',
   });
 }
 
