@@ -4,6 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { SubmissionStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { PublishAssignmentDto } from './dto/publish-assignment.dto';
 
@@ -64,21 +65,82 @@ export class AssignmentService {
     }
   }
 
-  async listForAdmin(params: { page: number; pageSize: number }) {
-    const { page, pageSize } = params;
-    const [total, rows] = await this.prisma.$transaction([
-      this.prisma.assignment.count(),
-      this.prisma.assignment.findMany({
-        orderBy: { createdAt: 'desc' },
-        skip: (page - 1) * pageSize,
-        take: pageSize,
-        include: {
-          homework: { select: { id: true, title: true, type: true } },
-          class: { select: { id: true, name: true } },
-        },
+  /**
+   * 老师端作业列表。
+   *   - 按截止时间升序（临近截止在前）
+   *   - 批量统计每个作业的提交/点评情况，派生批改状态：
+   *       PENDING 待批改（有已提交但未点评）/ DONE 已批完 / EMPTY 无人提交
+   *   - status 过滤：'pending' | 'done' | 'all'(默认)
+   *   - 统计一次性算出（groupBy），不做 N+1
+   *
+   * 规模保护：作业总量按 MAX_SCAN 上限扫描（MVP 足够；超过再做下推到 SQL）。
+   */
+  async listForAdmin(params: {
+    page: number;
+    pageSize: number;
+    status?: 'pending' | 'done' | 'all';
+  }) {
+    const { page, pageSize, status = 'all' } = params;
+    const MAX_SCAN = 500;
+
+    const rows = await this.prisma.assignment.findMany({
+      orderBy: { endAt: 'asc' },
+      take: MAX_SCAN,
+      include: {
+        homework: { select: { id: true, title: true, type: true } },
+        class: { select: { id: true, name: true } },
+      },
+    });
+    const ids = rows.map((r) => r.id);
+
+    const [submittedRows, commentRows] = await this.prisma.$transaction([
+      this.prisma.submission.findMany({
+        where: { assignmentId: { in: ids }, status: SubmissionStatus.SUBMITTED },
+        select: { assignmentId: true },
+      }),
+      this.prisma.teacherComment.findMany({
+        where: { submission: { assignmentId: { in: ids } } },
+        select: { submission: { select: { assignmentId: true } } },
       }),
     ]);
-    return { data: rows, meta: { total, page, pageSize } };
+
+    const submittedMap = new Map<string, number>();
+    submittedRows.forEach((s) =>
+      submittedMap.set(s.assignmentId, (submittedMap.get(s.assignmentId) ?? 0) + 1),
+    );
+    const commentedMap = new Map<string, number>();
+    commentRows.forEach((c) => {
+      const aid = c.submission.assignmentId;
+      commentedMap.set(aid, (commentedMap.get(aid) ?? 0) + 1);
+    });
+
+    const enriched = rows.map((r) => {
+      const submitted = submittedMap.get(r.id) ?? 0;
+      const commented = commentedMap.get(r.id) ?? 0;
+      const pending = submitted - commented;
+      const gradingStatus =
+        pending > 0 ? 'PENDING' : submitted > 0 ? 'DONE' : 'EMPTY';
+      return {
+        id: r.id,
+        startAt: r.startAt,
+        endAt: r.endAt,
+        remark: r.remark,
+        gradingStatus,
+        homework: r.homework,
+        class: r.class,
+      };
+    });
+
+    const filtered =
+      status === 'pending'
+        ? enriched.filter((a) => a.gradingStatus === 'PENDING')
+        : status === 'done'
+          ? enriched.filter((a) => a.gradingStatus === 'DONE')
+          : enriched;
+
+    const total = filtered.length;
+    const data = filtered.slice((page - 1) * pageSize, page * pageSize);
+    return { data, meta: { total, page, pageSize } };
   }
 
   // ------------------------------------------------------------------

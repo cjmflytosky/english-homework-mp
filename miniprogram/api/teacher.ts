@@ -98,21 +98,29 @@ export function getClassDetail(classId: string): Promise<ClassDetail> {
 
 // ---------------------- 作业批改 ----------------------
 
+/** 作业批改状态：待批改 / 已批完 / 无人提交 */
+export type GradingStatus = 'PENDING' | 'DONE' | 'EMPTY';
+
+/** 作业列表过滤的 tab */
+export type AssignmentTab = 'pending' | 'done' | 'all';
+
 export interface AdminAssignmentRow {
   id: string;
   startAt: string;
   endAt: string;
+  gradingStatus?: GradingStatus;
   class: { id: string; name: string };
   homework: { id: string; title: string; type: 'REPEAT' | 'RECITE' };
 }
 
 export function listAssignmentsForTeacher(
+  status: AssignmentTab = 'all',
   page = 1,
-  pageSize = 50,
+  pageSize = 20,
 ): Promise<AdminAssignmentRow[]> {
   return request<AdminAssignmentRow[]>({
     url: '/admin/assignments',
-    data: { page, pageSize },
+    data: { status, page, pageSize },
   });
 }
 

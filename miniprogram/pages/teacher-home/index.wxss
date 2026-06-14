@@ -38,15 +38,61 @@
 
 .empty { padding: 32rpx 0; text-align: center; }
 
+.tabs {
+  display: flex;
+  gap: 12rpx;
+  margin: 4rpx 0 20rpx;
+}
+.tab {
+  padding: 12rpx 32rpx;
+  background: #fff;
+  border-radius: 999rpx;
+  font-size: 26rpx;
+  color: #5a6071;
+}
+.tab--on {
+  background: #3d6bff;
+  color: #fff;
+  font-weight: 500;
+}
+
 .assignment-card {
   padding: 24rpx 28rpx;
   background: #fff;
   border-radius: 16rpx;
   margin-bottom: 16rpx;
 }
-.assignment-card__title { font-size: 30rpx; font-weight: 500; color: #1a1f36; }
+.assignment-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.assignment-card__title {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #1a1f36;
+  flex: 1;
+  min-width: 0;
+}
 .assignment-card__meta  { font-size: 24rpx; margin-top: 10rpx; }
 .dot { margin: 0 10rpx; }
+
+.grade-tag {
+  margin-left: 16rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 999rpx;
+  font-size: 20rpx;
+  flex-shrink: 0;
+}
+.grade-tag--PENDING { background: #fff1e6; color: #ff8a3d; font-weight: 600; }
+.grade-tag--DONE    { background: #e6f7ee; color: #1aab5b; }
+.grade-tag--EMPTY   { background: #f0f2f7; color: #7e8ab3; }
+
+.list-footer {
+  padding: 20rpx 0 8rpx;
+  text-align: center;
+  font-size: 24rpx;
+}
 
 .class-card {
   display: flex;

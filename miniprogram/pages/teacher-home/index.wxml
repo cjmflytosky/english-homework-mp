@@ -22,11 +22,26 @@
     <view class="admin-shortcut__arrow">›</view>
   </view>
 
-  <view class="section-title">待批改作业（{{assignments.length}}）</view>
+  <view class="section-title">待批改作业</view>
 
-  <view wx:if="{{loading && assignments.length === 0}}" class="text-soft empty">加载中…</view>
-  <view wx:if="{{!loading && assignments.length === 0}}" class="text-soft empty">
-    暂无作业。作业由系统按 curriculum 自动发布。
+  <view class="tabs">
+    <view
+      class="tab {{tab === 'pending' ? 'tab--on' : ''}}"
+      data-tab="pending"
+      bindtap="switchTab">待批改</view>
+    <view
+      class="tab {{tab === 'done' ? 'tab--on' : ''}}"
+      data-tab="done"
+      bindtap="switchTab">已批完</view>
+    <view
+      class="tab {{tab === 'all' ? 'tab--on' : ''}}"
+      data-tab="all"
+      bindtap="switchTab">全部</view>
+  </view>
+
+  <view wx:if="{{assignmentsLoading && assignments.length === 0}}" class="text-soft empty">加载中…</view>
+  <view wx:if="{{!assignmentsLoading && assignments.length === 0}}" class="text-soft empty">
+    {{tab === 'pending' ? '没有待批改的作业 🎉' : tab === 'done' ? '还没有已批完的作业' : '暂无作业'}}
   </view>
 
   <view
@@ -35,14 +50,24 @@
     class="assignment-card"
     data-id="{{item.id}}"
     bindtap="goAssignment">
-    <view class="assignment-card__title">{{item.homework.title}}</view>
+    <view class="assignment-card__head">
+      <view class="assignment-card__title">{{item.homework.title}}</view>
+      <view
+        wx:if="{{item.statusLabel}}"
+        class="grade-tag grade-tag--{{item.gradingStatus}}">{{item.statusLabel}}</view>
+    </view>
     <view class="assignment-card__meta text-soft">
       <text>{{item.class.name}}</text>
       <text class="dot">·</text>
       <text>{{item.homework.type === 'REPEAT' ? '跟读' : '背诵'}}</text>
       <text class="dot">·</text>
-      <text>{{item.dateRange}}</text>
+      <text>截止 {{item.dueLabel}}</text>
     </view>
+  </view>
+
+  <view wx:if="{{assignments.length > 0}}" class="list-footer text-soft">
+    <text wx:if="{{assignmentsLoading}}">加载中…</text>
+    <text wx:elif="{{!assignmentsMore}}">没有更多了</text>
   </view>
 
   <view class="section-title">我管理的班级（{{classes.length}}）</view>

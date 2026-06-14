@@ -6,6 +6,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { IsIn, IsOptional } from 'class-validator';
 import { AssignmentService } from './assignment.service';
 import { PublishAssignmentDto } from './dto/publish-assignment.dto';
 import {
@@ -18,6 +19,13 @@ import {
   assertStudent,
   assertTeacherOrAdmin,
 } from '../../common/guards/role-helpers';
+
+class AdminAssignmentListQueryDto extends PageQueryDto {
+  /** 批改状态过滤：pending 待批改 / done 已批完 / all 全部 */
+  @IsOptional()
+  @IsIn(['pending', 'done', 'all'])
+  status?: 'pending' | 'done' | 'all';
+}
 
 @Controller()
 export class AssignmentController {
@@ -36,9 +44,16 @@ export class AssignmentController {
   }
 
   @Get('admin/assignments')
-  listAdmin(@Query() q: PageQueryDto, @CurrentUser() user: JwtPayload) {
+  listAdmin(
+    @Query() q: AdminAssignmentListQueryDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
     assertTeacherOrAdmin(user);
-    return this.assignment.listForAdmin({ page: q.page, pageSize: q.pageSize });
+    return this.assignment.listForAdmin({
+      page: q.page,
+      pageSize: q.pageSize,
+      status: q.status,
+    });
   }
 
   // ---------------- 学生 ----------------
