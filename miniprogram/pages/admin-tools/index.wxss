@@ -76,3 +76,9 @@
 }
 .op-btn--role  { background: #fff1e6; color: #ff8a3d; }
 .op-btn--class { background: #e6f1ff; color: #3d6bff; }
+
+.list-footer {
+  padding: 28rpx 0 40rpx;
+  text-align: center;
+  font-size: 24rpx;
+}
