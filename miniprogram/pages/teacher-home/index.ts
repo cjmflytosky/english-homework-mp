@@ -71,11 +71,14 @@ Page<TeacherHomeData, { assignmentPage: number }>({
       wx.reLaunch({ url: '/pages/home/index' });
       return;
     }
+    const isAdmin = role === 'ADMIN';
     this.setData({
       nickname: student?.realName || student?.nickname || '老师',
-      roleLabel: role === 'ADMIN' ? '管理员' : '老师',
-      isAdmin: role === 'ADMIN',
+      roleLabel: isAdmin ? '管理员' : '老师',
+      isAdmin,
     });
+    // 导航栏标题是静态配置，无法数据绑定，按角色动态设置
+    wx.setNavigationBarTitle({ title: isAdmin ? '管理员端' : '老师端' });
     void this.loadClasses();
     void this.loadAssignments(true);
   },
