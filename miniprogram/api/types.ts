@@ -10,7 +10,7 @@ export interface ApiResponse<T> {
   meta?: { total: number; page: number; pageSize: number };
 }
 
-export type HomeworkType = 'REPEAT' | 'RECITE';
+export type HomeworkType = 'REPEAT' | 'RECITE' | 'WORD_CARD' | 'SENTENCE';
 
 export type AssignmentStatus =
   | 'PENDING'
@@ -39,6 +39,8 @@ export interface HomeworkItem {
   orderNo: number;
   text: string;
   translation?: string;
+  /** 配图（COS）—— 单词卡片作业用 */
+  imageUrl?: string;
   refAudioUrl?: string;
   score: number;
 }

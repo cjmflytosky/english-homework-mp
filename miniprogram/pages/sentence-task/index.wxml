@@ -1,0 +1,57 @@
+<view class="page-container" wx:if="{{item}}">
+  <view class="top-meta">
+    <view class="top-meta__index" wx:if="{{totalCount > 1}}">第 {{currentIndex + 1}} / {{totalCount}} 句</view>
+    <view class="top-meta__index" wx:else>长句跟读</view>
+    <view class="top-meta__type">长句</view>
+  </view>
+
+  <star-card title="老师布置的句子">
+    <view class="sentence-text">{{item.text}}</view>
+    <view class="sentence-cn text-soft" wx:if="{{item.translation}}">{{item.translation}}</view>
+  </star-card>
+
+  <star-card title="老师范读" extra="{{item.refAudioUrl ? '可播放' : '未上传'}}">
+    <view class="ref-audio" bindtap="onPlayRef">
+      <view class="ref-audio__btn">▶</view>
+      <view class="ref-audio__hint text-soft">
+        {{item.refAudioUrl ? '点击播放老师范读' : '老师暂未上传范读'}}
+      </view>
+    </view>
+  </star-card>
+
+  <!-- 录音区 -->
+  <view class="rec-zone card">
+    <block wx:if="{{phase === 'recording'}}">
+      <view class="rec-live__timer">{{elapsedSec}}s / {{maxSec}}s</view>
+      <view class="rec-live__stop" bindtap="onStopRecord">结束录音</view>
+    </block>
+
+    <view wx:elif="{{phase === 'recorded' || phase === 'uploaded'}}" class="rec-actions">
+      <view class="rec-action" bindtap="onPlayback">▶ 回放</view>
+      <view class="rec-action" bindtap="onReRecord">↺ 重录</view>
+      <view wx:if="{{phase === 'recorded'}}" class="rec-action rec-action--primary" bindtap="onUpload">↑ 上传</view>
+      <view wx:else class="rec-action rec-action--done">✓ 已上传</view>
+    </view>
+
+    <view wx:elif="{{phase === 'uploading' || phase === 'stopping'}}" class="rec-status text-soft">
+      {{ phase === 'uploading' ? '上传中…' : '处理中…' }}
+    </view>
+
+    <view wx:else class="rec-start" bindtap="onStartRecord">● 开始录音</view>
+
+    <view wx:if="{{phase === 'error'}}" class="rec-error">{{errorMsg}}</view>
+    <view wx:if="{{recordedSec && phase === 'uploaded'}}" class="rec-meta text-muted">本次时长 {{recordedSec}} 秒</view>
+  </view>
+
+  <view wx:if="{{totalCount > 1}}" class="progress-row text-soft">
+    已上传 <text class="text-accent">{{uploadedCount}}</text> / {{totalCount}} 句
+  </view>
+
+  <view class="nav-row">
+    <view wx:if="{{totalCount > 1}}" class="nav-btn {{(!hasPrev || busy) ? 'is-disabled' : ''}}" bindtap="goPrev">上一句</view>
+    <view wx:if="{{uploadedCount >= totalCount}}" class="nav-btn nav-btn--primary" bindtap="goFinalize">整体提交</view>
+    <view wx:elif="{{totalCount > 1}}" class="nav-btn {{(!hasNext || busy) ? 'is-disabled' : ''}}" bindtap="goNext">下一句</view>
+  </view>
+</view>
+
+<view wx:else class="page-container text-soft">加载中…</view>

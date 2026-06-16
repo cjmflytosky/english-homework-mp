@@ -151,6 +151,14 @@ Page<TeacherHomeData, { assignmentPage: number }>({
     wx.navigateTo({ url: '/pages/class-manage/index' });
   },
 
+  goCreateHomework() {
+    wx.navigateTo({ url: '/pages/teacher-homework-create/index' });
+  },
+
+  goAssignWordCard() {
+    wx.navigateTo({ url: '/pages/teacher-assign-wordcard/index' });
+  },
+
   goClass(e: { currentTarget: { dataset: { id: string; name: string } } }) {
     const { id, name } = e.currentTarget.dataset;
     wx.navigateTo({

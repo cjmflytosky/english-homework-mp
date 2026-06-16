@@ -22,6 +22,24 @@
     <view class="admin-shortcut__arrow">›</view>
   </view>
 
+  <view class="admin-shortcut" bindtap="goAssignWordCard">
+    <view class="admin-shortcut__icon">🃏</view>
+    <view class="admin-shortcut__text">
+      <view class="admin-shortcut__title">布置单词跟读</view>
+      <view class="admin-shortcut__desc text-soft">选预置单元 · 派发给班级</view>
+    </view>
+    <view class="admin-shortcut__arrow">›</view>
+  </view>
+
+  <view class="admin-shortcut" bindtap="goCreateHomework">
+    <view class="admin-shortcut__icon">🎙️</view>
+    <view class="admin-shortcut__text">
+      <view class="admin-shortcut__title">布置长句作业</view>
+      <view class="admin-shortcut__desc text-soft">录一句话 · 学生跟读</view>
+    </view>
+    <view class="admin-shortcut__arrow">›</view>
+  </view>
+
   <view class="section-title">待批改作业</view>
 
   <view class="tabs">

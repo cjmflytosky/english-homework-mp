@@ -23,9 +23,15 @@ Page<TaskDetailData, Record<string, never>>({
     this.setData({ loading: true });
     try {
       const d = await getAssignmentDetail(id);
+      const typeLabelMap: Record<string, string> = {
+        REPEAT: '跟读',
+        RECITE: '背诵',
+        WORD_CARD: '单词卡片',
+        SENTENCE: '长句',
+      };
       const decorated = {
         ...d,
-        typeLabel: d.homework.type === 'REPEAT' ? '跟读' : '背诵',
+        typeLabel: typeLabelMap[d.homework.type] ?? '作业',
         endAtLabel: new Date(d.endAt).toLocaleString(),
       };
       this.setData({ detail: decorated });
@@ -42,12 +48,20 @@ Page<TaskDetailData, Record<string, never>>({
     const { idx } = e.currentTarget.dataset;
     // 把整个详情通过页面级缓存传给子页（避免再发一次请求）
     const items = this.data.detail.homework.items;
+    const type = this.data.detail.homework.type;
     wx.setStorageSync('current_task_items', items);
     wx.setStorageSync('current_task_meta', {
       assignmentId: this.data.detail.id,
       homeworkTitle: this.data.detail.homework.title,
-      type: this.data.detail.homework.type,
+      type,
     });
-    wx.navigateTo({ url: `/pages/task-content/index?idx=${idx}` });
+    // 按作业类型分流到不同答题页（单词卡片在分包 pkgWordCard 内）
+    const url =
+      type === 'WORD_CARD'
+        ? `/pkgWordCard/index?idx=${idx}`
+        : type === 'SENTENCE'
+          ? `/pages/sentence-task/index?idx=${idx}`
+          : `/pages/task-content/index?idx=${idx}`;
+    wx.navigateTo({ url });
   },
 });

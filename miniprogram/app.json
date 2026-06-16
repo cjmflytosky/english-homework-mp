@@ -6,14 +6,24 @@
     "pages/profile/index",
     "pages/task-detail/index",
     "pages/task-content/index",
+    "pages/sentence-task/index",
     "pages/submit-result/index",
     "pages/history/index",
     "pages/teacher-home/index",
+    "pages/teacher-homework-create/index",
+    "pages/teacher-assign-wordcard/index",
     "pages/teacher-class/index",
     "pages/teacher-review/index",
     "pages/admin-tools/index",
     "pages/class-manage/index",
     "pages/class-students/index"
+  ],
+  "subPackages": [
+    {
+      "root": "pkgWordCard",
+      "name": "wordCard",
+      "pages": ["index"]
+    }
   ],
   "window": {
     "backgroundColor": "#0E1A4A",

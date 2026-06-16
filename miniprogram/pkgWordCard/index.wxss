@@ -1,0 +1,83 @@
+.top-meta {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 20rpx;
+}
+.top-meta__index { font-size: 26rpx; color: #C7D0EA; }
+.top-meta__type {
+  font-size: 22rpx;
+  padding: 4rpx 14rpx;
+  border-radius: 999rpx;
+  background: rgba(122,167,255,0.18);
+  color: #7AA7FF;
+}
+
+/* 卡片：竖版配图占满宽度 */
+.word-card {
+  padding: 28rpx 24rpx 24rpx;
+  display: flex; flex-direction: column; align-items: center;
+  transition: transform 0.15s;
+}
+.word-card:active { transform: scale(0.99); }
+.word-card__label {
+  align-self: flex-start;
+  font-size: 26rpx; margin-bottom: 16rpx;
+}
+.word-card__img {
+  width: 100%;
+  border-radius: 16rpx;
+  background: rgba(255,255,255,0.06);
+}
+.word-card__img--empty {
+  width: 100%; height: 360rpx; border-radius: 16rpx;
+  background: rgba(255,255,255,0.06);
+  display: flex; align-items: center; justify-content: center;
+  color: #7E8AB3; font-size: 26rpx;
+}
+.word-card__hint { margin-top: 20rpx; font-size: 24rpx; text-align: center; }
+
+/* 录音区 */
+.rec-zone {
+  margin-top: 24rpx; padding: 32rpx; min-height: 120rpx;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+}
+.rec-live__timer { font-size: 40rpx; font-weight: 700; color: #FFFFFF; }
+.rec-live__stop {
+  margin-top: 20rpx;
+  padding: 16rpx 48rpx; border-radius: 999rpx;
+  background: linear-gradient(135deg, #FF7AA7, #FF3D6B);
+  color: #fff; font-size: 28rpx;
+  box-shadow: 0 10rpx 24rpx rgba(255,61,107,0.4);
+}
+.rec-actions { display: flex; gap: 20rpx; justify-content: center; flex-wrap: wrap; }
+.rec-action {
+  padding: 16rpx 36rpx; border-radius: 999rpx;
+  background: rgba(255,255,255,0.08);
+  border: 2rpx solid rgba(255,255,255,0.16);
+  color: #C7D0EA; font-size: 26rpx;
+}
+.rec-action--primary {
+  background: linear-gradient(135deg, #7AA7FF, #3D6BFF);
+  color: #fff; border: none;
+  box-shadow: 0 10rpx 24rpx rgba(61,107,255,0.4);
+}
+.rec-action--done { color: #7AD4A7; border-color: rgba(122,212,167,0.4); }
+.rec-status { font-size: 26rpx; }
+.rec-error { margin-top: 12rpx; font-size: 24rpx; color: #F08A8A; }
+.rec-meta { margin-top: 12rpx; font-size: 22rpx; }
+
+/* 进度 / 导航 */
+.progress-row { text-align: center; font-size: 24rpx; margin: 24rpx 0 12rpx; }
+.nav-row { display: flex; justify-content: space-between; gap: 20rpx; }
+.nav-btn {
+  flex: 1; text-align: center; height: 76rpx; line-height: 76rpx;
+  background: rgba(255,255,255,0.08);
+  border: 2rpx solid rgba(255,255,255,0.16);
+  border-radius: 38rpx; color: #C7D0EA; font-size: 26rpx;
+}
+.nav-btn.is-disabled { opacity: 0.35; }
+.nav-btn--primary {
+  background: linear-gradient(135deg, #7AA7FF, #3D6BFF);
+  color: #FFFFFF; border: none;
+  box-shadow: 0 10rpx 24rpx rgba(61,107,255,0.4);
+}

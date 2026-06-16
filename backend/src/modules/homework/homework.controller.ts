@@ -32,7 +32,7 @@ export class HomeworkController {
 
   @Post()
   create(@Body() dto: CreateHomeworkDto, @CurrentUser() user: JwtPayload) {
-    assertAdmin(user);
+    assertTeacherOrAdmin(user);
     return this.homework.create(dto, user.sub);
   }
 
@@ -44,6 +44,16 @@ export class HomeworkController {
       pageSize: q.pageSize,
       createdById: user.sub,
     });
+  }
+
+  /** 可派发作业列表（老师「布置预置作业」用，可按 type 过滤，如 WORD_CARD） */
+  @Get('assignable')
+  listAssignable(
+    @Query('type') type: string | undefined,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    assertTeacherOrAdmin(user);
+    return this.homework.listAssignable(type);
   }
 
   @Get(':id')

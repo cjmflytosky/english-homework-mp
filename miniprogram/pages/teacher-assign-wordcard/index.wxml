@@ -1,0 +1,45 @@
+<view class="page-container">
+  <view class="hint text-soft">选择一个单元的单词卡片，派发给班级</view>
+
+  <view wx:if="{{loading}}" class="text-soft empty">加载中…</view>
+  <view wx:elif="{{homeworks.length === 0}}" class="text-soft empty">
+    暂无预置的单词卡片作业（需先在 curriculum.yaml 配置并同步）
+  </view>
+
+  <view
+    wx:for="{{homeworks}}"
+    wx:key="id"
+    class="hw-card {{selectedId === item.id ? 'hw-card--on' : ''}}"
+    data-id="{{item.id}}"
+    bindtap="onSelect">
+    <view class="hw-card__main">
+      <view class="hw-card__title">{{item.title}}</view>
+      <view class="hw-card__meta text-soft">{{item.itemCount}} 张卡片</view>
+    </view>
+    <view class="hw-card__check">{{selectedId === item.id ? '✓' : ''}}</view>
+  </view>
+
+  <view wx:if="{{!loading && homeworks.length > 0}}" class="publish-zone card">
+    <view class="publish-zone__title">派发设置</view>
+
+    <view class="form-row">
+      <text class="form-row__label">班级</text>
+      <picker mode="selector" range="{{classNames}}" value="{{classIndex}}" bindchange="onClassChange">
+        <view class="picker-val">{{classNames.length ? classNames[classIndex] : '暂无班级'}} ▾</view>
+      </picker>
+    </view>
+
+    <view class="form-row">
+      <text class="form-row__label">截止</text>
+      <picker mode="date" value="{{endDate}}" bindchange="onEndDateChange">
+        <view class="picker-val">{{endDate}} ▾</view>
+      </picker>
+    </view>
+
+    <view class="actions">
+      <star-button bindtap="onPublish" disabled="{{publishing || !selectedId || !classNames.length}}">
+        {{publishing ? '派发中…' : (selectedId ? '派发所选作业' : '请先选择作业')}}
+      </star-button>
+    </view>
+  </view>
+</view>

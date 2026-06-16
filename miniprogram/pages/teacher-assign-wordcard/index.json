@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "布置单词跟读",
+  "usingComponents": {
+    "star-button": "/components/star-button/index"
+  }
+}

@@ -32,13 +32,15 @@ interface CurriculumClassDef {
 interface CurriculumItemDef {
   text: string;
   translation?: string;
+  /** 配图 URL（COS）—— 单词卡片作业用 */
+  imageUrl?: string;
   refAudioUrl?: string;
 }
 
 interface CurriculumHomeworkDef {
   code: string;
   title: string;
-  type: 'REPEAT' | 'RECITE';
+  type: 'REPEAT' | 'RECITE' | 'WORD_CARD' | 'SENTENCE';
   description?: string;
   releaseAt: string;
   dueAt: string;
@@ -191,11 +193,13 @@ async function upsertHomeworkItems(
         orderNo,
         text: it.text,
         translation: it.translation,
+        imageUrl: it.imageUrl,
         refAudioUrl: it.refAudioUrl,
       },
       update: {
         text: it.text,
         translation: it.translation,
+        imageUrl: it.imageUrl,
         refAudioUrl: it.refAudioUrl,
       },
     });

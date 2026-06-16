@@ -62,3 +62,8 @@ coverage/
 tmp/
 .tmp/
 .superpowers/
+
+# ---------- 单词卡片原图（已压缩打包进 miniprogram/pkgWordCard/images，原图不入库）----------
+# 注意用根锚定（前导 /），否则会误伤 backend/src/modules/homework 等同名子目录
+/作业图片/
+/homework/

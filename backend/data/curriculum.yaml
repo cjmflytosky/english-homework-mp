@@ -16,12 +16,15 @@
 #   homeworks[].code        作业唯一业务码（关键！upsert 用它定位）
 #   homeworks[].title       展示标题
 #   homeworks[].type        REPEAT（跟读）/ RECITE（背诵）
+#                           / WORD_CARD（单词卡片：图片+范读，学生跟读）
+#                           / SENTENCE（长句：通常由老师在小程序里录制，一般不写这里）
 #   homeworks[].description 可选，作业说明
 #   homeworks[].releaseAt   何时开始可见（ISO 时间或 "YYYY-MM-DD HH:MM"）
 #   homeworks[].dueAt       截止时间
 #   homeworks[].classes     发给哪些班（空数组 = 所有班级）
-#   homeworks[].items[].text         题目英文原文
+#   homeworks[].items[].text         题目英文原文（单词卡片即单词本身）
 #   homeworks[].items[].translation  中文翻译（可选）
+#   homeworks[].items[].imageUrl     配图 URL（单词卡片用，COS 上传后填回）
 #   homeworks[].items[].refAudioUrl  参考音频 URL（可选，COS 上传后填回）
 #
 # 删除作业：把 yaml 里那一项删掉后重新部署，sync 脚本会清理掉「不再列出」
@@ -45,7 +48,7 @@ semester: "2026-spring"
 admins:
   - openId: "ouEM43c58NPiFm-ui1bidx1FWSrQ"
     role: ADMIN
-    name: "项目管理员"
+    name: "李老师"
 
   # - openId: "ocf6X5_yyyyyyyyyyyyyyyyyyy"
   #   role: TEACHER
@@ -90,6 +93,73 @@ homeworks:
         translation: "我很好，谢谢，你呢？"
       - text: "Nice to meet you."
         translation: "很高兴见到你。"
+
+  # —— 单词卡片作业：配图已压缩打包在小程序分包 pkgWordCard 内 ——
+  # imageUrl 用「小程序本地路径」(以 / 开头)，不是 COS。图片本身已含文字，
+  # 故卡片只展示图；暂无范读，点卡片直接「嘟 → 录音」。
+  # 将来要加范读：把音频传 COS，填回各 item 的 refAudioUrl 即可。
+  - code: "u7-word-cards"
+    title: "第七单元 · 单词卡片"
+    type: WORD_CARD
+    description: "看图跟读：点击卡片，嘟一声后开始录音"
+    releaseAt: "2026-06-01 00:00"
+    dueAt: "2026-12-31 23:59"       # 窗口覆盖今天，便于联调
+    classes: ["DEFAULT"]
+    items:
+      - text: "第七单元 · 1"
+        imageUrl: "/pkgWordCard/images/unit7/57.jpg"
+      - text: "第七单元 · 2"
+        imageUrl: "/pkgWordCard/images/unit7/58.jpg"
+      - text: "第七单元 · 3"
+        imageUrl: "/pkgWordCard/images/unit7/59.jpg"
+      - text: "第七单元 · 4"
+        imageUrl: "/pkgWordCard/images/unit7/60.jpg"
+      - text: "第七单元 · 5"
+        imageUrl: "/pkgWordCard/images/unit7/61.jpg"
+      - text: "第七单元 · 6"
+        imageUrl: "/pkgWordCard/images/unit7/62.jpg"
+
+  - code: "u8-word-cards"
+    title: "第八单元 · 单词卡片"
+    type: WORD_CARD
+    description: "看图跟读：点击卡片，嘟一声后开始录音"
+    releaseAt: "2026-06-01 00:00"
+    dueAt: "2026-12-31 23:59"
+    classes: ["DEFAULT"]
+    items:
+      - text: "第八单元 · 1"
+        imageUrl: "/pkgWordCard/images/unit8/63.jpg"
+      - text: "第八单元 · 2"
+        imageUrl: "/pkgWordCard/images/unit8/64.jpg"
+      - text: "第八单元 · 3"
+        imageUrl: "/pkgWordCard/images/unit8/65.jpg"
+      - text: "第八单元 · 4"
+        imageUrl: "/pkgWordCard/images/unit8/66.jpg"
+      - text: "第八单元 · 5"
+        imageUrl: "/pkgWordCard/images/unit8/67.jpg"
+      - text: "第八单元 · 6"
+        imageUrl: "/pkgWordCard/images/unit8/68.jpg"
+
+  - code: "u9-word-cards"
+    title: "第九单元 · 单词卡片"
+    type: WORD_CARD
+    description: "看图跟读：点击卡片，嘟一声后开始录音"
+    releaseAt: "2026-06-01 00:00"
+    dueAt: "2026-12-31 23:59"
+    classes: ["DEFAULT"]
+    items:
+      - text: "第九单元 · 1"
+        imageUrl: "/pkgWordCard/images/unit9/69.jpg"
+      - text: "第九单元 · 2"
+        imageUrl: "/pkgWordCard/images/unit9/70.jpg"
+      - text: "第九单元 · 3"
+        imageUrl: "/pkgWordCard/images/unit9/71.jpg"
+      - text: "第九单元 · 4"
+        imageUrl: "/pkgWordCard/images/unit9/72.jpg"
+      - text: "第九单元 · 5"
+        imageUrl: "/pkgWordCard/images/unit9/73.jpg"
+      - text: "第九单元 · 6"
+        imageUrl: "/pkgWordCard/images/unit9/74.jpg"
 
   - code: "u2-my-family"
     title: "Unit 2 · My Family"

@@ -6,7 +6,7 @@
  *
  * 录音参数：mp3 / 16kHz / 16k 比特率，便于后续走 SOE 评测。
  */
-const MAX_DURATION_MS = 60_000; // 单题最长 60 秒
+const DEFAULT_MAX_DURATION_MS = 60_000; // 默认单题最长 60 秒
 
 export interface RecordResult {
   tempFilePath: string;
@@ -17,6 +17,7 @@ export interface RecordResult {
 let manager: any = null;
 let timer: ReturnType<typeof setInterval> | null = null;
 let elapsedMs = 0;
+let currentMaxMs = DEFAULT_MAX_DURATION_MS;
 let frameCb: ((ms: number) => void) | null = null;
 
 function ensureManager() {
@@ -24,10 +25,14 @@ function ensureManager() {
   return manager;
 }
 
-export function start(onFrame?: (ms: number) => void): Promise<void> {
+export function start(
+  onFrame?: (ms: number) => void,
+  maxDurationMs?: number,
+): Promise<void> {
   return new Promise((resolve, reject) => {
     const mgr = ensureManager();
     elapsedMs = 0;
+    currentMaxMs = maxDurationMs ?? DEFAULT_MAX_DURATION_MS;
     frameCb = onFrame ?? null;
 
     const onStart = () => {
@@ -37,7 +42,7 @@ export function start(onFrame?: (ms: number) => void): Promise<void> {
       timer = setInterval(() => {
         elapsedMs += 200;
         frameCb?.(elapsedMs);
-        if (elapsedMs >= MAX_DURATION_MS) {
+        if (elapsedMs >= currentMaxMs) {
           mgr.stop();
         }
       }, 200);
@@ -53,7 +58,7 @@ export function start(onFrame?: (ms: number) => void): Promise<void> {
     mgr.onError?.(onError);
 
     mgr.start({
-      duration: MAX_DURATION_MS,
+      duration: currentMaxMs,
       sampleRate: 16000,
       numberOfChannels: 1,
       encodeBitRate: 24000,
@@ -92,5 +97,5 @@ export function stop(): Promise<RecordResult> {
 }
 
 export function getMaxDurationMs(): number {
-  return MAX_DURATION_MS;
+  return DEFAULT_MAX_DURATION_MS;
 }

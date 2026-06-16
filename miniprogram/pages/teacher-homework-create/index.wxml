@@ -1,0 +1,94 @@
+<view class="page-container">
+
+  <!-- 步骤 1：编辑 + 录音 -->
+  <block wx:if="{{step === 'edit'}}">
+    <star-card title="作业标题">
+      <input
+        class="field-input"
+        placeholder="如：Unit 3 长句跟读"
+        value="{{title}}"
+        bindinput="onTitleInput"/>
+    </star-card>
+
+    <star-card title="长句文字">
+      <textarea
+        class="field-textarea"
+        placeholder="输入要让学生跟读的英文长句"
+        value="{{sentence}}"
+        maxlength="500"
+        auto-height
+        bindinput="onSentenceInput"/>
+    </star-card>
+
+    <star-card title="老师范读" extra="{{recPhase === 'uploaded' ? '已上传' : '最长 60 秒'}}">
+      <view class="rec-zone">
+        <block wx:if="{{recPhase === 'recording'}}">
+          <view class="rec-live__timer">{{elapsedSec}}s / {{maxSec}}s</view>
+          <view class="rec-live__stop" bindtap="onStopRecord">结束录音</view>
+        </block>
+
+        <view wx:elif="{{recPhase === 'recorded' || recPhase === 'uploaded'}}" class="rec-actions">
+          <view class="rec-action" bindtap="onPlayback">▶ 回放</view>
+          <view class="rec-action" bindtap="onReRecord">↺ 重录</view>
+          <view wx:if="{{recPhase === 'recorded'}}" class="rec-action rec-action--primary" bindtap="onUploadAudio">↑ 上传</view>
+          <view wx:else class="rec-action rec-action--done">✓ 已上传</view>
+        </view>
+
+        <view wx:elif="{{recPhase === 'uploading' || recPhase === 'stopping'}}" class="rec-status text-soft">
+          {{ recPhase === 'uploading' ? '上传中…' : '处理中…' }}
+        </view>
+
+        <view wx:else class="rec-start" bindtap="onStartRecord">● 开始录音</view>
+
+        <view wx:if="{{recPhase === 'error'}}" class="rec-error">{{recErrorMsg}}</view>
+        <view wx:if="{{recordedSec && (recPhase === 'recorded' || recPhase === 'uploaded')}}" class="rec-meta text-muted">
+          本次时长 {{recordedSec}} 秒
+        </view>
+      </view>
+    </star-card>
+
+    <view class="actions">
+      <star-button bindtap="onCreate" disabled="{{creating}}">
+        {{creating ? '创建中…' : '创建作业'}}
+      </star-button>
+    </view>
+  </block>
+
+  <!-- 步骤 2：派发 -->
+  <block wx:else>
+    <view class="created-tip card">
+      <view class="created-tip__check">✓</view>
+      <view class="created-tip__text">作业已创建，下面把它派发给班级</view>
+    </view>
+
+    <star-card title="派发到班级">
+      <picker
+        mode="selector"
+        range="{{classNames}}"
+        value="{{classIndex}}"
+        bindchange="onClassChange">
+        <view class="picker-row">
+          <text>{{classNames.length ? classNames[classIndex] : '暂无班级'}}</text>
+          <text class="picker-row__arrow">▾</text>
+        </view>
+      </picker>
+    </star-card>
+
+    <star-card title="截止日期">
+      <picker mode="date" value="{{endDate}}" bindchange="onEndDateChange">
+        <view class="picker-row">
+          <text>{{endDate}}</text>
+          <text class="picker-row__arrow">▾</text>
+        </view>
+      </picker>
+    </star-card>
+
+    <view class="actions">
+      <star-button bindtap="onPublish" disabled="{{publishing || !classNames.length}}">
+        {{publishing ? '派发中…' : '派发作业'}}
+      </star-button>
+      <view class="skip-link" bindtap="onSkipPublish">稍后再派发</view>
+    </view>
+  </block>
+
+</view>

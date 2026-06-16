@@ -28,10 +28,12 @@ enum StudentRole {
   ADMIN       // 管理员（可升降级他人 role，可设置班级归属）
 }
 
-/// 作业类型：跟读 / 背诵
+/// 作业类型：跟读 / 背诵 / 单词卡片 / 长句
 enum HomeworkType {
-  REPEAT  // 跟读
-  RECITE  // 背诵
+  REPEAT     // 跟读
+  RECITE     // 背诵
+  WORD_CARD  // 单词卡片（图片+范读，学生跟读，自动串联：范读→嘟→录音）
+  SENTENCE   // 长句（老师录制范读，学生跟读）
 }
 
 /// 整体提交状态
@@ -173,6 +175,8 @@ model HomeworkItem {
   text        String   @db.Text
   /// 中文翻译（可选）
   translation String?  @db.Text
+  /// 配图 URL（COS）—— 单词卡片作业用
+  imageUrl    String?  @map("image_url")
   /// 参考音频 URL（COS）
   refAudioUrl String?  @map("ref_audio_url")
   /// 该题分值（默认按平均分摊）

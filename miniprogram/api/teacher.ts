@@ -4,7 +4,7 @@
  * 鉴权方式：JWT 里携带 studentRole=TEACHER 或 ADMIN，后端 role-helpers 判断。
  */
 import { request } from '../utils/request';
-import { StudentRole } from './types';
+import { HomeworkType, StudentRole } from './types';
 
 // ---------------------- 班级 ----------------------
 
@@ -94,6 +94,72 @@ export interface ClassDetail {
 
 export function getClassDetail(classId: string): Promise<ClassDetail> {
   return request<ClassDetail>({ url: `/admin/classes/${classId}` });
+}
+
+// ---------------------- 作业创建 / 派发 ----------------------
+
+export interface CreateHomeworkItemPayload {
+  text: string;
+  translation?: string;
+  imageUrl?: string;
+  refAudioUrl?: string;
+  score?: number;
+}
+
+export interface CreateHomeworkPayload {
+  title: string;
+  description?: string;
+  type: HomeworkType;
+  items: CreateHomeworkItemPayload[];
+}
+
+/** 老师 / 管理员创建作业（含题目）。返回新建作业（至少含 id） */
+export function createHomework(
+  payload: CreateHomeworkPayload,
+): Promise<{ id: string; title: string; type: HomeworkType }> {
+  return request<{ id: string; title: string; type: HomeworkType }>({
+    url: '/admin/homeworks',
+    method: 'POST',
+    data: { ...payload },
+  });
+}
+
+export interface AssignableHomeworkRow {
+  id: string;
+  title: string;
+  type: HomeworkType;
+  itemCount: number;
+}
+
+/** 可派发作业列表（老师布置预置作业用，可按 type 过滤，如 WORD_CARD） */
+export function listAssignableHomeworks(
+  type?: HomeworkType,
+): Promise<AssignableHomeworkRow[]> {
+  return request<AssignableHomeworkRow[]>({
+    url: '/admin/homeworks/assignable',
+    data: type ? { type } : {},
+  });
+}
+
+export interface PublishAssignmentPayload {
+  homeworkId: string;
+  /** 不传则派发到默认班级（inviteCode=DEFAULT） */
+  classId?: string;
+  /** ISO 时间字符串 */
+  startAt: string;
+  endAt: string;
+  remark?: string;
+}
+
+/** 把作业派发到班级 */
+export function publishAssignment(
+  payload: PublishAssignmentPayload,
+): Promise<{ id: string }> {
+  return request<{ id: string }>({
+    url: '/admin/assignments',
+    method: 'POST',
+    data: { ...payload },
+  });
 }
 
 // ---------------------- 作业批改 ----------------------

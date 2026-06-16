@@ -15,7 +15,6 @@ import {
 } from '../../common/decorators/current-user.decorator';
 import { PageQueryDto } from '../../common/dto/page-query.dto';
 import {
-  assertAdmin,
   assertStudent,
   assertTeacherOrAdmin,
 } from '../../common/guards/role-helpers';
@@ -33,13 +32,13 @@ export class AssignmentController {
 
   // ---------------- 老师 / 管理员 ----------------
 
-  /** MVP：作业由 curriculum.yaml 同步发布；这个接口保留给未来 H5 后台或临时补发 */
+  /** 老师 / 管理员把作业派发到班级 */
   @Post('admin/assignments')
   publish(
     @Body() dto: PublishAssignmentDto,
     @CurrentUser() user: JwtPayload,
   ) {
-    assertAdmin(user);
+    assertTeacherOrAdmin(user);
     return this.assignment.publish(dto, user.sub);
   }
 

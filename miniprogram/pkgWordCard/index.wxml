@@ -1,0 +1,64 @@
+<view class="page-container" wx:if="{{item}}">
+  <view class="top-meta">
+    <view class="top-meta__index">第 {{currentIndex + 1}} / {{totalCount}} 张</view>
+    <view class="top-meta__type">单词卡片</view>
+  </view>
+
+  <!-- 卡片：点击触发「（范读 →）嘟 → 录音」串联 -->
+  <view class="card word-card {{busy ? 'is-busy' : ''}}" bindtap="onTapCard">
+    <view class="word-card__label text-soft" wx:if="{{item.text}}">{{item.text}}</view>
+    <image
+      wx:if="{{item.imageUrl}}"
+      class="word-card__img"
+      src="{{item.imageUrl}}"
+      mode="widthFix"/>
+    <view wx:else class="word-card__img--empty">暂无配图</view>
+
+    <view class="word-card__hint text-muted">
+      {{ phase === 'playing'   ? '正在播放范读…' :
+         phase === 'beeping'   ? '嘟——准备录音…' :
+         phase === 'recording' ? '正在录音…' :
+         phase === 'idle'      ? '点击卡片：嘟一声后开始跟读' :
+         phase === 'recorded'  ? '录好了，可回放 / 重录 / 上传' :
+         phase === 'uploaded'  ? '已上传 ✓，点击可重新跟读' : '' }}
+    </view>
+  </view>
+
+  <!-- 录音状态区 -->
+  <view class="rec-zone card">
+    <block wx:if="{{phase === 'recording'}}">
+      <view class="rec-live__timer">{{elapsedSec}}s / {{maxSec}}s</view>
+      <view class="rec-live__stop" bindtap="onStopRecord">结束录音</view>
+    </block>
+
+    <view wx:elif="{{phase === 'recorded' || phase === 'uploaded'}}" class="rec-actions">
+      <view class="rec-action" bindtap="onPlayback">▶ 回放</view>
+      <view class="rec-action" bindtap="onReRecord">↺ 重录</view>
+      <view wx:if="{{phase === 'recorded'}}" class="rec-action rec-action--primary" bindtap="onUpload">↑ 上传</view>
+      <view wx:else class="rec-action rec-action--done">✓ 已上传</view>
+    </view>
+
+    <view wx:elif="{{phase === 'uploading' || phase === 'stopping'}}" class="rec-status text-soft">
+      {{ phase === 'uploading' ? '上传中…' : '处理中…' }}
+    </view>
+
+    <view wx:else class="rec-status text-muted">
+      {{ phase === 'playing' || phase === 'beeping' ? '请仔细听…' : '点击上方卡片开始' }}
+    </view>
+
+    <view wx:if="{{phase === 'error'}}" class="rec-error">{{errorMsg}}</view>
+    <view wx:if="{{recordedSec && phase === 'uploaded'}}" class="rec-meta text-muted">本次时长 {{recordedSec}} 秒</view>
+  </view>
+
+  <view class="progress-row text-soft">
+    已上传 <text class="text-accent">{{uploadedCount}}</text> / {{totalCount}} 张
+  </view>
+
+  <view class="nav-row">
+    <view class="nav-btn {{(!hasPrev || busy) ? 'is-disabled' : ''}}" bindtap="goPrev">上一张</view>
+    <view wx:if="{{uploadedCount >= totalCount}}" class="nav-btn nav-btn--primary" bindtap="goFinalize">整体提交</view>
+    <view wx:else class="nav-btn {{(!hasNext || busy) ? 'is-disabled' : ''}}" bindtap="goNext">下一张</view>
+  </view>
+</view>
+
+<view wx:else class="page-container text-soft">加载中…</view>

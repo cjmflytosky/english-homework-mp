@@ -24,6 +24,10 @@ export class CreateHomeworkItemDto {
 
   @IsOptional()
   @IsString()
+  imageUrl?: string;
+
+  @IsOptional()
+  @IsString()
   refAudioUrl?: string;
 
   @IsOptional()
