@@ -17,13 +17,15 @@
     <view class="login-card__title">学生登录</view>
 
     <view class="profile-row">
-      <button
-        class="avatar-btn"
-        open-type="chooseAvatar"
-        bindchooseavatar="onChooseAvatar">
-        <image wx:if="{{avatar}}" src="{{avatar}}" class="avatar"/>
-        <view wx:else class="avatar avatar--placeholder">头像</view>
-      </button>
+      <view class="avatar-wrap">
+        <button
+          class="avatar-btn"
+          open-type="chooseAvatar"
+          bindchooseavatar="onChooseAvatar">
+          <image wx:if="{{avatar}}" src="{{avatar}}" class="avatar"/>
+          <view wx:else class="avatar avatar--placeholder">头像</view>
+        </button>
+      </view>
       <input
         class="nickname-input"
         type="nickname"
