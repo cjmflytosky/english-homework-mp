@@ -69,8 +69,6 @@ model AdminUser {
   updatedAt DateTime  @updatedAt      @map("updated_at")
 
   classes       Class[]          @relation("ClassOwner")
-  homeworks     Homework[]       @relation("HomeworkCreator")
-  assignments   Assignment[]     @relation("AssignmentCreator")
 
   @@map("admin_user")
 }
@@ -154,8 +152,9 @@ model Homework {
   type        HomeworkType @default(REPEAT)
   /// 总分（评分系统使用，0~100）；MVP 阶段不展示分数，此字段无意义但保留
   totalScore  Int          @default(100) @map("total_score")
+  /// 创建者 id：可能是后台 AdminUser（curriculum 同步用 system）或小程序老师 Student。
+  /// 跨两套用户体系，故不设外键关联。
   createdById String       @map("created_by_id")
-  createdBy   AdminUser    @relation("HomeworkCreator", fields: [createdById], references: [id])
   createdAt   DateTime     @default(now()) @map("created_at")
   updatedAt   DateTime     @updatedAt      @map("updated_at")
 
@@ -209,7 +208,6 @@ model Assignment {
 
   homework    Homework  @relation(fields: [homeworkId], references: [id], onDelete: Cascade)
   class       Class     @relation(fields: [classId], references: [id], onDelete: Cascade)
-  createdBy   AdminUser @relation("AssignmentCreator", fields: [createdById], references: [id])
   submissions Submission[]
 
   @@unique([homeworkId, classId])
