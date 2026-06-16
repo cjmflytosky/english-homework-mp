@@ -2,6 +2,7 @@ import { HomeworkItem, SubmissionItem } from '../../api/types';
 import {
   start as startRecord,
   stop as stopRecord,
+  isRecording,
   RecordResult,
 } from '../../utils/recorder';
 import { playbackLocal, uploadRecording } from '../../utils/recording-flow';
@@ -153,7 +154,7 @@ Page<SentenceData, PageState>({
 
   // ---------------- 录音（手动开始 / 结束，60s 自动停） ----------------
   async onStartRecord() {
-    if (this.data.busy) return;
+    if (this.data.busy || isRecording()) return;
     const ok = await this.ensureMicAuth();
     if (!ok) return;
     await this.beginRecord();
@@ -163,13 +164,14 @@ Page<SentenceData, PageState>({
     try {
       this.lastRecord = null;
       this.setData({ phase: 'recording', elapsedSec: 0, errorMsg: '', busy: true });
-      await startRecord((ms) => {
-        const sec = Math.floor(ms / 1000);
-        if (sec !== this.data.elapsedSec) this.setData({ elapsedSec: sec });
-        if (ms >= SENTENCE_MAX_MS && this.data.phase === 'recording') {
-          void this.finishRecord();
-        }
-      }, SENTENCE_MAX_MS + 2000);
+      await startRecord(
+        (ms) => {
+          const sec = Math.floor(ms / 1000);
+          if (sec !== this.data.elapsedSec) this.setData({ elapsedSec: sec });
+        },
+        SENTENCE_MAX_MS,
+        (rec) => this.onRecorded(rec), // 到 60s 自动停
+      );
     } catch (err) {
       this.setData({
         phase: 'error',
@@ -180,20 +182,15 @@ Page<SentenceData, PageState>({
   },
 
   onStopRecord() {
-    void this.finishRecord();
+    void this.handleManualStop();
   },
 
-  async finishRecord() {
+  async handleManualStop() {
     if (this.data.phase !== 'recording') return;
     this.setData({ phase: 'stopping' });
     try {
       const rec = await stopRecord();
-      this.lastRecord = rec;
-      this.setData({
-        phase: 'recorded',
-        recordedSec: Math.round(rec.duration / 1000),
-        busy: false,
-      });
+      this.onRecorded(rec);
     } catch (err) {
       this.setData({
         phase: 'error',
@@ -201,6 +198,17 @@ Page<SentenceData, PageState>({
         errorMsg: err instanceof Error ? err.message : '录音结束失败',
       });
     }
+  },
+
+  /** 录音停止（手动或自动）后统一进入「已录制」 */
+  onRecorded(rec: RecordResult) {
+    if (this.data.phase === 'recorded' || this.data.phase === 'uploaded') return;
+    this.lastRecord = rec;
+    this.setData({
+      phase: 'recorded',
+      recordedSec: Math.round(rec.duration / 1000),
+      busy: false,
+    });
   },
 
   // ---------------- 回放 / 重录 / 上传 ----------------
@@ -211,6 +219,7 @@ Page<SentenceData, PageState>({
   },
 
   onReRecord() {
+    if (isRecording()) return;
     void this.beginRecord();
   },
 

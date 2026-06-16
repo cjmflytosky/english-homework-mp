@@ -12,6 +12,7 @@ import {
 import {
   start as startRecord,
   stop as stopRecord,
+  isRecording,
   RecordResult,
 } from '../../utils/recorder';
 import { playbackLocal } from '../../utils/recording-flow';
@@ -109,7 +110,7 @@ Page<CreateData, PageState>({
 
   // ---------------- 录音 ----------------
   async onStartRecord() {
-    if (this.data.recPhase === 'recording') return;
+    if (this.data.recPhase === 'recording' || isRecording()) return;
     const ok = await this.ensureMicAuth();
     if (!ok) return;
     await this.beginRecord();
@@ -119,13 +120,14 @@ Page<CreateData, PageState>({
     try {
       this.lastRecord = null;
       this.setData({ recPhase: 'recording', elapsedSec: 0, recErrorMsg: '' });
-      await startRecord((ms) => {
-        const sec = Math.floor(ms / 1000);
-        if (sec !== this.data.elapsedSec) this.setData({ elapsedSec: sec });
-        if (ms >= SENTENCE_MAX_MS && this.data.recPhase === 'recording') {
-          void this.finishRecord();
-        }
-      }, SENTENCE_MAX_MS + 2000);
+      await startRecord(
+        (ms) => {
+          const sec = Math.floor(ms / 1000);
+          if (sec !== this.data.elapsedSec) this.setData({ elapsedSec: sec });
+        },
+        SENTENCE_MAX_MS,
+        (rec) => this.onRecorded(rec), // 到 60s 自动停
+      );
     } catch (err) {
       this.setData({
         recPhase: 'error',
@@ -135,26 +137,32 @@ Page<CreateData, PageState>({
   },
 
   onStopRecord() {
-    void this.finishRecord();
+    void this.handleManualStop();
   },
 
-  async finishRecord() {
+  async handleManualStop() {
     if (this.data.recPhase !== 'recording') return;
     this.setData({ recPhase: 'stopping' });
     try {
       const rec = await stopRecord();
-      this.lastRecord = rec;
-      this.setData({
-        recPhase: 'recorded',
-        recordedSec: Math.round(rec.duration / 1000),
-        refAudioUrl: '',
-      });
+      this.onRecorded(rec);
     } catch (err) {
       this.setData({
         recPhase: 'error',
         recErrorMsg: err instanceof Error ? err.message : '录音结束失败',
       });
     }
+  },
+
+  /** 录音停止（手动或自动）后统一进入「已录制」 */
+  onRecorded(rec: RecordResult) {
+    if (this.data.recPhase === 'recorded' || this.data.recPhase === 'uploaded') return;
+    this.lastRecord = rec;
+    this.setData({
+      recPhase: 'recorded',
+      recordedSec: Math.round(rec.duration / 1000),
+      refAudioUrl: '',
+    });
   },
 
   onPlayback() {
@@ -164,6 +172,7 @@ Page<CreateData, PageState>({
   },
 
   onReRecord() {
+    if (isRecording()) return;
     void this.beginRecord();
   },
 

@@ -2,6 +2,7 @@ import { HomeworkItem, SubmissionItem } from '../api/types';
 import {
   start as startRecord,
   stop as stopRecord,
+  isRecording,
   RecordResult,
 } from '../utils/recorder';
 import { beep } from '../utils/beep';
@@ -23,37 +24,35 @@ type Phase =
   | 'error';
 
 interface WordCardData {
+  items: HomeworkItem[];
   item: HomeworkItem | null;
   totalCount: number;
   currentIndex: number;
-  hasPrev: boolean;
-  hasNext: boolean;
   phase: Phase;
   elapsedSec: number;
   maxSec: number;
   recordedSec: number;
   errorMsg: string;
   uploadedCount: number;
-  busy: boolean; // 串联/录音/上传中：禁用翻页与重复触发
+  busy: boolean; // 串联/录音/上传中
 }
 
 interface PageState {
   assignmentId: string;
-  items: HomeworkItem[];
   audioCtx: WechatMiniprogram.InnerAudioContext | null;
   playbackCtx: WechatMiniprogram.InnerAudioContext | null;
   uploadedMap: Record<string, SubmissionItem>;
   lastRecord: RecordResult | null;
   delayTimer: ReturnType<typeof setTimeout> | null;
+  flowRunning: boolean; // 同步守卫，防止「范读→嘟→录音」被重复触发
 }
 
 Page<WordCardData, PageState>({
   data: {
+    items: [],
     item: null,
     totalCount: 0,
     currentIndex: 0,
-    hasPrev: false,
-    hasNext: false,
     phase: 'idle',
     elapsedSec: 0,
     maxSec: Math.floor(CARD_MAX_MS / 1000),
@@ -64,12 +63,12 @@ Page<WordCardData, PageState>({
   },
 
   assignmentId: '',
-  items: [],
   audioCtx: null,
   playbackCtx: null,
   uploadedMap: {},
   lastRecord: null,
   delayTimer: null,
+  flowRunning: false,
 
   onLoad(query: Record<string, string | undefined>) {
     const items =
@@ -83,8 +82,8 @@ Page<WordCardData, PageState>({
       wx.navigateBack();
       return;
     }
-    this.items = items;
     this.assignmentId = meta.assignmentId;
+    this.setData({ items, totalCount: items.length });
 
     void this.preloadUploaded();
     const idx = Math.max(0, Math.min(Number(query.idx ?? 0), items.length - 1));
@@ -103,10 +102,7 @@ Page<WordCardData, PageState>({
       this.setData({ uploadedCount: Object.keys(map).length });
       const cur = this.data.item;
       if (cur && map[cur.id]) {
-        this.setData({
-          phase: 'uploaded',
-          recordedSec: map[cur.id].duration ?? 0,
-        });
+        this.setData({ phase: 'uploaded', recordedSec: map[cur.id].duration ?? 0 });
       }
     } catch (err) {
       console.warn('[word-card] preload failed', err);
@@ -114,17 +110,21 @@ Page<WordCardData, PageState>({
   },
 
   onUnload() {
-    if (this.data.phase === 'recording') {
-      void stopRecord().catch(() => undefined);
-    }
+    this.abortOngoing();
     this.cleanupAudio();
   },
 
-  cleanupAudio() {
+  /** 停掉进行中的录音/串联（切卡、卸载时用，丢弃未上传的本地录音） */
+  abortOngoing() {
+    if (isRecording()) void stopRecord().catch(() => undefined);
     if (this.delayTimer) {
       clearTimeout(this.delayTimer);
       this.delayTimer = null;
     }
+    this.flowRunning = false;
+  },
+
+  cleanupAudio() {
     this.audioCtx?.stop();
     this.audioCtx?.destroy?.();
     this.audioCtx = null;
@@ -136,14 +136,11 @@ Page<WordCardData, PageState>({
   renderAt(idx: number) {
     this.cleanupAudio();
     this.lastRecord = null;
-    const item = this.items[idx];
+    const item = this.data.items[idx];
     const uploaded = this.uploadedMap[item.id];
     this.setData({
       item,
-      totalCount: this.items.length,
       currentIndex: idx,
-      hasPrev: idx > 0,
-      hasNext: idx < this.items.length - 1,
       phase: uploaded ? 'uploaded' : 'idle',
       elapsedSec: 0,
       recordedSec: uploaded?.duration ?? 0,
@@ -152,7 +149,16 @@ Page<WordCardData, PageState>({
     });
   },
 
-  // ---------------- 串联：范读 → 1s → 嘟 → 自动录音 ----------------
+  // ---------------- swiper 滑动切卡 ----------------
+  onSwiperChange(e: { detail: { current: number } }) {
+    const next = e.detail.current;
+    if (next === this.data.currentIndex) return;
+    // 切走时停掉当前进行中的录音/串联（未上传的会丢弃）
+    this.abortOngoing();
+    this.renderAt(next);
+  },
+
+  // ---------------- 串联：（范读 →）嘟 → 自动录音 ----------------
   onTapCard() {
     const { phase } = this.data;
     if (
@@ -166,23 +172,28 @@ Page<WordCardData, PageState>({
   },
 
   async startFlow() {
-    const item = this.data.item;
-    if (!item) return;
-    const ok = await this.ensureMicAuth();
-    if (!ok) return;
+    if (this.flowRunning || isRecording()) return; // 同步防重入
+    this.flowRunning = true;
+    try {
+      const item = this.data.item;
+      if (!item) return;
+      const ok = await this.ensureMicAuth();
+      if (!ok) return;
 
-    this.lastRecord = null;
-    this.setData({ busy: true, errorMsg: '' });
+      this.lastRecord = null;
+      this.setData({ busy: true, errorMsg: '' });
 
-    // 有范读才播放（暂无范读时直接进入「嘟 → 录音」）
-    if (item.refAudioUrl) {
-      this.setData({ phase: 'playing' });
-      await this.playRef(item.refAudioUrl);
-      await this.wait(REF_TO_BEEP_DELAY_MS);
+      if (item.refAudioUrl) {
+        this.setData({ phase: 'playing' });
+        await this.playRef(item.refAudioUrl);
+        await this.wait(REF_TO_BEEP_DELAY_MS);
+      }
+      this.setData({ phase: 'beeping' });
+      await beep();
+      await this.beginRecord();
+    } finally {
+      this.flowRunning = false;
     }
-    this.setData({ phase: 'beeping' });
-    await beep();
-    await this.beginRecord();
   },
 
   playRef(src: string): Promise<void> {
@@ -213,13 +224,14 @@ Page<WordCardData, PageState>({
   async beginRecord() {
     try {
       this.setData({ phase: 'recording', elapsedSec: 0, busy: true });
-      await startRecord((ms) => {
-        const sec = Math.floor(ms / 1000);
-        if (sec !== this.data.elapsedSec) this.setData({ elapsedSec: sec });
-        if (ms >= CARD_MAX_MS && this.data.phase === 'recording') {
-          void this.finishRecord();
-        }
-      }, CARD_MAX_MS + 2000);
+      await startRecord(
+        (ms) => {
+          const sec = Math.floor(ms / 1000);
+          if (sec !== this.data.elapsedSec) this.setData({ elapsedSec: sec });
+        },
+        CARD_MAX_MS,
+        (rec) => this.onRecorded(rec), // 到 30s 自动停
+      );
     } catch (err) {
       this.setData({
         phase: 'error',
@@ -230,20 +242,15 @@ Page<WordCardData, PageState>({
   },
 
   onStopRecord() {
-    void this.finishRecord();
+    void this.handleManualStop();
   },
 
-  async finishRecord() {
-    if (this.data.phase !== 'recording') return; // 防止自动停与手动停重入
+  async handleManualStop() {
+    if (this.data.phase !== 'recording') return;
     this.setData({ phase: 'stopping' });
     try {
       const rec = await stopRecord();
-      this.lastRecord = rec;
-      this.setData({
-        phase: 'recorded',
-        recordedSec: Math.round(rec.duration / 1000),
-        busy: false,
-      });
+      this.onRecorded(rec);
     } catch (err) {
       this.setData({
         phase: 'error',
@@ -251,6 +258,17 @@ Page<WordCardData, PageState>({
         errorMsg: err instanceof Error ? err.message : '录音结束失败',
       });
     }
+  },
+
+  /** 录音停止（手动或自动）后统一进入「已录制」 */
+  onRecorded(rec: RecordResult) {
+    if (this.data.phase === 'recorded' || this.data.phase === 'uploaded') return;
+    this.lastRecord = rec;
+    this.setData({
+      phase: 'recorded',
+      recordedSec: Math.round(rec.duration / 1000),
+      busy: false,
+    });
   },
 
   // ---------------- 回放 / 重录 / 上传 ----------------
@@ -261,6 +279,7 @@ Page<WordCardData, PageState>({
   },
 
   onReRecord() {
+    if (this.flowRunning || isRecording()) return;
     void this.beginRecord();
   },
 
@@ -290,16 +309,9 @@ Page<WordCardData, PageState>({
     }
   },
 
-  // ---------------- 翻页 / 提交 ----------------
-  goPrev() {
-    if (this.data.hasPrev && !this.data.busy) this.renderAt(this.data.currentIndex - 1);
-  },
-  goNext() {
-    if (this.data.hasNext && !this.data.busy) this.renderAt(this.data.currentIndex + 1);
-  },
-
+  // ---------------- 提交 ----------------
   goFinalize() {
-    if (this.data.uploadedCount < this.items.length) {
+    if (this.data.uploadedCount < this.data.items.length) {
       wx.showToast({ title: '还有卡片未完成', icon: 'none' });
       return;
     }
