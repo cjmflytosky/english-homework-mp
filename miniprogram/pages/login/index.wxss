@@ -86,13 +86,16 @@
   border: none;
 }
 .avatar {
+  display: block;
+  width: 96rpx;
+  height: 96rpx;
+}
+.avatar-placeholder {
   width: 96rpx;
   height: 96rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-.avatar--placeholder {
   color: #C7D0EA;
   font-size: 22rpx;
 }

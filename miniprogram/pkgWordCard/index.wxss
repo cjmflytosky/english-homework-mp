@@ -42,6 +42,12 @@
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   text-align: center;
 }
+.rec-start {
+  padding: 20rpx 64rpx; border-radius: 999rpx;
+  background: linear-gradient(135deg, #FF7AA7, #FF3D6B);
+  color: #fff; font-size: 30rpx; font-weight: 600;
+  box-shadow: 0 12rpx 28rpx rgba(255,61,107,0.45);
+}
 .rec-live__timer { font-size: 40rpx; font-weight: 700; color: #FFFFFF; }
 .rec-live__stop {
   margin-top: 20rpx;
@@ -75,3 +81,4 @@
   color: #FFFFFF; font-size: 28rpx; font-weight: 600;
   box-shadow: 0 10rpx 24rpx rgba(61,107,255,0.4);
 }
+.finalize-btn.is-loading { opacity: 0.6; }

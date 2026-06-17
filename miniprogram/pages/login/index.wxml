@@ -20,10 +20,11 @@
       <view class="avatar-wrap">
         <button
           class="avatar-btn"
+          hover-class="none"
           open-type="chooseAvatar"
           bindchooseavatar="onChooseAvatar">
-          <image wx:if="{{avatar}}" src="{{avatar}}" class="avatar"/>
-          <view wx:else class="avatar avatar--placeholder">头像</view>
+          <image wx:if="{{avatar}}" src="{{avatar}}" class="avatar" mode="aspectFill"/>
+          <view wx:else class="avatar-placeholder">头像</view>
         </button>
       </view>
       <input
